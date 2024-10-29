@@ -1,0 +1,15 @@
+{
+  "name": "rayleigh-labels",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "BunnyNabbit",
+  "license": "MIT",
+  "dependencies": {
+    "@atproto/api": "^0.13.12",
+    "express": "^4.21.1"
+  }
+}
