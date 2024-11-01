@@ -98,15 +98,15 @@ app.post('/addlabel/', async (req, res) => {
 	}
 })
 
-const maxRetries = 1
+const maxRetries = 5
 
 app.post('/hydrateposts', async (req, res) => {
 	for (let i = 0; i <= maxRetries; i++) {
 		try {
 			console.log(req.body)
-			agent.hydratePosts(req.body.uris).then(response => {
-				res.json(response.data)
-			})
+			const response = await agent.hydratePosts(req.body.uris)
+			res.json(response.data)
+			break
 		} catch (error) {
 			if (i === maxRetries) {
 				console.error(error)
@@ -120,16 +120,16 @@ app.post('/hydrateposts', async (req, res) => {
 
 })
 
-app.post('/getreports/', async (req, res) => {
+app.get('/getreports/', async (req, res) => {
 	for (let i = 0; i <= maxRetries; i++) {
 		try {
-			await agent.label(req.body.label, req.body.uri)
-			res.json({ message: "ok" })
+			const reports = await agent.queryStatuses()
+			res.json(reports)
 			break
 		} catch (error) {
 			if (i === maxRetries) {
-				console.error(`Failed to apply label after ${maxRetries} attempts:`, error)
-				res.status(500).json({ message: "Failed to apply label" })
+				console.error(error)
+				res.status(500).json({ message: "Failed" })
 			} else {
 				console.warn(`Attempt ${i + 1} failed, retrying...`)
 				await new Promise(resolve => setTimeout(resolve, 1000))
