@@ -9,25 +9,26 @@ class AgentP {
 		this.agent = new Agent(this.session)
 		this.ready = this.session.login({ identifier: handle, password }).then(() => {
 			this.agent.addLabeler(labelerDID)
+			console.log(this.agent)
 		})
 		this.labelerDID = labelerDID
 		// this.agent.api.tools.ozone.moderation.getEvents()
 	}
-	async label(label, uri) {
+	async label(addLabels, negateLabels, uri) {
 		const res = await this.agent.app.bsky.feed.getPosts({
 			uris: [uri]
 		})
 		const promises = []
 		res.data.posts.forEach(post => {
-			if (!post.cid) return console.log("how wtf", uri)
+			if (!post.cid) return
 			const cid = post.cid
 			promises.push(this.agent.tools.ozone.moderation.emitEvent(
 				{
 					// specify the label event
 					event: {
 						$type: "tools.ozone.moderation.defs#modEventLabel",
-						createLabelVals: [label],
-						negateLabelVals: []
+						createLabelVals: addLabels,
+						negateLabelVals: negateLabels
 					},
 					// specify the labeled post by strongRef
 					subject: {
@@ -36,14 +37,49 @@ class AgentP {
 						cid,
 					},
 					// put in the rest of the metadata
-					createdBy: this.agent.session.did,
+					createdBy: this.agent.sessionManager.did,
 					createdAt: new Date().toISOString(),
 					subjectBlobCids: [],
 				},
 				{
 					encoding: "application/json",
 					headers: {
-						"atproto-proxy": `${this.agent.session.did}#atproto_labeler`,
+						"atproto-proxy": `${this.labelerDID}#atproto_labeler`,
+					},
+				}
+			))
+		})
+		await Promise.all(promises)
+	}
+	async acknowledgeReport(uri) { // TODO: it might be better to have a function for emitting events to zhe ozone instance.
+		const res = await this.agent.app.bsky.feed.getPosts({
+			uris: [uri]
+		})
+		const promises = []
+		res.data.posts.forEach(post => {
+			if (!post.cid) return
+			const cid = post.cid
+			promises.push(this.agent.tools.ozone.moderation.emitEvent(
+				{
+					// specify the label event
+					event: {
+						$type: "tools.ozone.moderation.defs#modEventAcknowledge"
+					},
+					// specify the labeled post by strongRef
+					subject: {
+						$type: "com.atproto.repo.strongRef",
+						uri,
+						cid,
+					},
+					// put in the rest of the metadata
+					createdBy: this.agent.sessionManager.did,
+					createdAt: new Date().toISOString(),
+					subjectBlobCids: [],
+				},
+				{
+					encoding: "application/json",
+					headers: {
+						"atproto-proxy": `${this.labelerDID}#atproto_labeler`,
 					},
 				}
 			))
@@ -81,12 +117,11 @@ app.use(function (req, res, next) {
 
 app.post('/addlabel/', async (req, res) => {
 	await agent.ready
-	console.log(req.body.label)
-	console.log(req.body.uri)
-	const maxRetries = 5;
 	for (let i = 0; i <= maxRetries; i++) {
 		try {
-			await labeler.label(req.body.label, req.body.uri)
+			if (req.body.add.length || req.body.negate.length) {
+				await agent.label(req.body.add, req.body.negate, req.body.uri)
+			}
 			res.json({ message: "ok" })
 			break // Successfully labeled, exit the loop
 		} catch (error) {
@@ -97,6 +132,14 @@ app.post('/addlabel/', async (req, res) => {
 				console.warn(`Attempt ${i + 1} failed, retrying...`)
 				await new Promise(resolve => setTimeout(resolve, 1000))
 			}
+		}
+	}
+	for (let i = 0; i <= maxRetries; i++) {
+		try {
+			await agent.acknowledgeReport(req.body.uri)
+			break
+		} catch (error) {
+			console.error("Failed to acknowledge", error)
 		}
 	}
 })

@@ -26,8 +26,20 @@ class API {
 			return json
 		})
 	}
-	label(uri, apply = true, values = []) {
-		fetch()
+	label(data) {
+		return fetch("/addlabel", {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			method: "POST",
+			body: JSON.stringify(data)
+		}).then(function (response) {
+			if (!response.ok) {
+				throw new Error("HTTP error " + response.status);
+			}
+			return response.json()
+		})
 	}
 	getLabels() {
 		return fetch("/labels.json").then(response => {
@@ -119,6 +131,7 @@ function displayPost(post) {
 	currentPost = post
 	currentPosition = 0
 	switchPostImage()
+	updateLabels(post)
 }
 
 function updatePositionIndicator(post) {
@@ -131,8 +144,21 @@ function switchPostImage(direction = DIRECTION.STILL) {
 	const max = currentPost.renderImages.length
 	const newPosition = currentPosition + direction
 	currentPosition = Math.max(Math.min(newPosition, max), 0)
-	currentSubjectElement.src = currentPost.renderImages[currentPosition].fullsize
+	const media = currentPost.renderImages[currentPosition]
+	currentSubjectElement.src = media.fullsize
+	currentSubjectElement.title = media.alt
+	currentSubjectElement.alt = media.alt
 	updatePositionIndicator(currentPost)
+}
+
+function updateLabels(post) {
+	labelElements.forEach(labelElement => {
+		labelElement.checked = false
+	})
+	post.labels.forEach(label => {
+		const labelElement = labelElements.find(element => element.id == label.val)
+		if (labelElement) labelElement.checked = true
+	})
 }
 
 document.addEventListener('keydown', function (event) {
@@ -142,7 +168,19 @@ document.addEventListener('keydown', function (event) {
 	if (event.key == "ArrowRight") {
 		switchPostImage(DIRECTION.RIGHT)
 	}
-});
+	if (event.key == "Enter") {
+		if (!currentPost) return
+		queue.shift()
+		const postLabels = currentPost.labels.filter(label => label.neg != true) // i forget if zhe appview hydrates negated labels or not. doing zhis just in case.
+		const currentLabelValues = labelElements.map(element => { return { name: element.id, checked: element.checked } })
+		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
+		const negate = currentLabelValues.filter(currentValue => currentValue.checked == false && postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
+		api.label({
+			add, negate, uri: currentPost.uri
+		})
+		if (queue[0]) displayPost(queue[0])
+	}
+})
 
 const funnyEmptyQueueMessages = [
 	"Incredible! You're a real bridge raiser!",
@@ -153,15 +191,37 @@ function randomIntFromInterval(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) + min)
 }
 
+let labelElements = []
 // populate labels
-api.getLabels().then(response => {
-	console.log(response)
+api.getLabels().then(labels => {
+	currentLabelsElement.innerHTML = ""
+	labels.forEach(label => {
+		const inputElement = document.createElement('input')
+		inputElement.type = 'checkbox'
+		inputElement.id = label.value
+
+		const labelElement = document.createElement('label')
+		labelElement.htmlFor = label.value
+		labelElement.textContent = label.readableName
+		labelElement.style.backgroundColor = label.backgroundColor
+		labelElement.style.color = label.textColor
+
+		// Optional: Add alt key functionality
+		if (label.altKey) {
+			inputElement.accessKey = label.altKey // Use accessKey for alt key
+			labelElement.title = `Alt+${label.altKey}` // Add tooltip for accessibility
+		}
+
+		currentLabelsElement.appendChild(inputElement)
+		currentLabelsElement.appendChild(labelElement)
+		labelElements.push(inputElement)
+	})
 	// populate queue
 	populateQueue().then(() => {
 		if (queue[0]) {
 			displayPost(queue[0])
 		} else {
-			alert(funnyEmptyQueueMessages[randomIntFromInterval(0, funnyEmptyQueueMessages.length -1)])
+			alert(funnyEmptyQueueMessages[randomIntFromInterval(0, funnyEmptyQueueMessages.length - 1)])
 		}
 	}).catch((err) => {
 		alert("Error while getting queue")
