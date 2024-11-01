@@ -7,7 +7,9 @@ class AgentP {
 	constructor(handle, password, labelerDID) {
 		this.session = new CredentialSession("https://bsky.social")
 		this.agent = new Agent(this.session)
-		this.ready = this.session.login({ identifier: handle, password })
+		this.ready = this.session.login({ identifier: handle, password }).then(() => {
+			this.agent.addLabeler(labelerDID)
+		})
 		this.labelerDID = labelerDID
 		// this.agent.api.tools.ozone.moderation.getEvents()
 	}
@@ -58,7 +60,7 @@ class AgentP {
 		}, {
 			encoding: "application/json",
 			headers: {
-				"atproto-proxy": `did:plc:bv3lcacietc6fkdokxfqtdkj#atproto_labeler`,
+				"atproto-proxy": `${this.labelerDID}#atproto_labeler`,
 			},
 		})
 	}
@@ -78,6 +80,7 @@ app.use(function (req, res, next) {
 })
 
 app.post('/addlabel/', async (req, res) => {
+	await agent.ready
 	console.log(req.body.label)
 	console.log(req.body.uri)
 	const maxRetries = 5;
@@ -101,6 +104,7 @@ app.post('/addlabel/', async (req, res) => {
 const maxRetries = 5
 
 app.post('/hydrateposts', async (req, res) => {
+	await agent.ready
 	for (let i = 0; i <= maxRetries; i++) {
 		try {
 			console.log(req.body)
@@ -121,6 +125,7 @@ app.post('/hydrateposts', async (req, res) => {
 })
 
 app.get('/getreports/', async (req, res) => {
+	await agent.ready
 	for (let i = 0; i <= maxRetries; i++) {
 		try {
 			const reports = await agent.queryStatuses()
@@ -139,7 +144,7 @@ app.get('/getreports/', async (req, res) => {
 })
 
 const agentKey = require("./agentKeys.json")
-const agent = new AgentP(agentKey.handle, agentKey.password)
+const agent = new AgentP(agentKey.handle, agentKey.password, agentKey.labelerDID)
 
 app.listen(port, () => {
 	console.log(`Example app listening on port ${port}`)
