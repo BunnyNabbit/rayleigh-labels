@@ -87,16 +87,21 @@ function chunkArray(array, number) {
 }
 
 function filterTransformEmbedTypes(posts) {
-	// TODO: support "app.bsky.embed.recordWithMedia#view"
-	const supportedTypes = ["app.bsky.embed.images#view"]
+	const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view"]
 	console.log("posts", posts)
 	const filteredPosts = posts.filter(post => {
 		return post.embed && supportedTypes.includes(post.embed["$type"])
 	})
 	filteredPosts.forEach(post => {
 		console.log(post)
-		if (post.embed["$type"] == "app.bsky.embed.images#view") {
+		const type = post.embed["$type"]
+		if (type == "app.bsky.embed.images#view") {
 			post.renderImages = post.embed.images
+		}
+		if (type == "app.bsky.embed.recordWithMedia#view") {
+			if (post.embed.media["$type"] == "app.bsky.embed.images#view") {
+				post.renderImages = post.embed.media.images
+			}
 		}
 		post.renderImages.forEach(media => {
 			setTimeout(() => {
