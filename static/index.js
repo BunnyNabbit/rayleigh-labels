@@ -63,6 +63,7 @@ const DIRECTION = {
 const currentSubjectElement = document.getElementById("currentSubject")
 const currentLabelsElement = document.getElementById("currentLabels")
 const positionIndicatorElement = document.getElementById("positionIndicator")
+const placeholderImageUrl = currentSubjectElement.src
 
 function preloadImage(url) {
 	const preloadImage = new Image()
@@ -178,7 +179,13 @@ document.addEventListener('keydown', function (event) {
 		api.label({
 			add, negate, uri: currentPost.uri
 		})
-		if (queue[0]) displayPost(queue[0])
+		if (queue[0]) {
+			displayPost(queue[0])
+		} else {
+			currentPost = null
+			currentSubjectElement.src = placeholderImageUrl
+			getSet()
+		}
 	}
 })
 
@@ -217,6 +224,10 @@ api.getLabels().then(labels => {
 		labelElements.push(inputElement)
 	})
 	// populate queue
+	getSet()
+})
+
+function getSet() {
 	populateQueue().then(() => {
 		if (queue[0]) {
 			displayPost(queue[0])
@@ -227,4 +238,4 @@ api.getLabels().then(labels => {
 		alert("Error while getting queue")
 		console.error(err)
 	})
-})
+}
