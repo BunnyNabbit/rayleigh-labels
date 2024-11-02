@@ -128,6 +128,7 @@ app.post('/addlabel/', async (req, res) => {
 			if (i === maxRetries) {
 				console.error(`Failed to apply label after ${maxRetries} attempts:`, error)
 				res.status(500).json({ message: "Failed to apply label" })
+				return
 			} else {
 				console.warn(`Attempt ${i + 1} failed, retrying...`)
 				await new Promise(resolve => setTimeout(resolve, 1000))
