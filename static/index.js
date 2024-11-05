@@ -133,7 +133,9 @@ async function populateQueue() {
 const queue = []
 let currentPost = null
 let currentPosition = 0
+let viewedAll = false
 function displayPost(post) {
+	viewedAll = false
 	currentPost = post
 	currentPosition = 0
 	switchPostImage()
@@ -147,9 +149,10 @@ function updatePositionIndicator(post) {
 
 function switchPostImage(direction = DIRECTION.STILL) {
 	if (!currentPost) return
-	const max = currentPost.renderImages.length
+	const max = currentPost.renderImages.length - 1
 	const newPosition = currentPosition + direction
 	currentPosition = Math.max(Math.min(newPosition, max), 0)
+	if (currentPosition == max) viewedAll = true
 	const media = currentPost.renderImages[currentPosition]
 	currentSubjectElement.src = media.fullsize
 	currentSubjectElement.title = media.alt
@@ -176,6 +179,7 @@ document.addEventListener('keydown', function (event) {
 	}
 	if (event.key == "Enter") {
 		if (!currentPost) return
+		if (!viewedAll) return switchPostImage(DIRECTION.RIGHT)
 		queue.shift()
 		const postLabels = currentPost.labels.filter(label => label.neg != true) // i forget if zhe appview hydrates negated labels or not. doing zhis just in case.
 		const currentLabelValues = labelElements.map(element => { return { name: element.id, checked: element.checked } })
