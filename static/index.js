@@ -170,14 +170,55 @@ function updateLabels(post) {
 	})
 }
 
-document.addEventListener('keydown', function (event) {
-	if (event.key == "ArrowLeft") {
+class Control {
+	constructor() {
+		document.addEventListener('keydown', (event) => {
+			if (event.key == "ArrowLeft") {
+				this.switchLeft()
+			}
+			if (event.key == "ArrowRight") {
+				this.switchRight()
+			}
+			if (event.key == "Enter") {
+				this.next()
+			}			
+		})
+		let touchStartX = null
+		let touchStartY = null
+		const threshold = 50
+		document.addEventListener('touchstart', (event) => {
+			touchStartX = event.touches[0].clientX
+			touchStartY = event.touches[0].clientY
+		})
+		document.addEventListener('touchend', (event) => {
+			if (!touchStartX || !touchStartY) return
+			const touchEndX = event.changedTouches[0].clientX
+			const touchEndY = event.changedTouches[0].clientY
+			const deltaX = touchEndX - touchStartX
+			const deltaY = touchEndY - touchStartY
+			if (Math.abs(deltaX) > threshold && Math.abs(deltaY) < threshold) {
+				if (deltaX > 0) {
+					this.switchRight()
+				} else {
+					this.switchLeft()
+				}
+			}
+			if (Math.abs(deltaY) > threshold && Math.abs(deltaX) < threshold) {
+				if (deltaY < 0) {
+					this.next()
+				}
+			}
+			touchStartX = null
+			touchStartY = null
+		})
+	}
+	switchLeft() {
 		switchPostImage(DIRECTION.LEFT)
 	}
-	if (event.key == "ArrowRight") {
+	switchRight() {
 		switchPostImage(DIRECTION.RIGHT)
 	}
-	if (event.key == "Enter") {
+	next() {
 		if (!currentPost) return
 		if (!viewedAll) return switchPostImage(DIRECTION.RIGHT)
 		queue.shift()
@@ -196,7 +237,9 @@ document.addEventListener('keydown', function (event) {
 			getSet()
 		}
 	}
-})
+}
+
+new Control()
 
 const funnyEmptyQueueMessages = [
 	"Incredible! You're a real bridge raiser!",
