@@ -12,7 +12,6 @@ class AgentP {
 			console.log(this.agent)
 		})
 		this.labelerDID = labelerDID
-		// this.agent.api.tools.ozone.moderation.getEvents()
 	}
 	async emitModerationEvent(uri, event) {
 		const res = await this.agent.app.bsky.feed.getPosts({ uris: [uri] })
