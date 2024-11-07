@@ -14,29 +14,19 @@ class AgentP {
 		this.labelerDID = labelerDID
 		// this.agent.api.tools.ozone.moderation.getEvents()
 	}
-	async label(addLabels, negateLabels, uri) {
-		const res = await this.agent.app.bsky.feed.getPosts({
-			uris: [uri]
-		})
-		const promises = []
-		res.data.posts.forEach(post => {
-			if (!post.cid) return
-			const cid = post.cid
-			promises.push(this.agent.tools.ozone.moderation.emitEvent(
+	async emitModerationEvent(uri, event) {
+		const res = await this.agent.app.bsky.feed.getPosts({ uris: [uri] })
+		const promises = res.data.posts.map(post => {
+			if (!post.cid) return Promise.resolve()
+
+			return this.agent.tools.ozone.moderation.emitEvent(
 				{
-					// specify the label event
-					event: {
-						$type: "tools.ozone.moderation.defs#modEventLabel",
-						createLabelVals: addLabels,
-						negateLabelVals: negateLabels
-					},
-					// specify the labeled post by strongRef
+					event: event,
 					subject: {
 						$type: "com.atproto.repo.strongRef",
 						uri,
-						cid,
+						cid: post.cid,
 					},
-					// put in the rest of the metadata
 					createdBy: this.agent.sessionManager.did,
 					createdAt: new Date().toISOString(),
 					subjectBlobCids: [],
@@ -47,44 +37,27 @@ class AgentP {
 						"atproto-proxy": `${this.labelerDID}#atproto_labeler`,
 					},
 				}
-			))
+			)
 		})
 		await Promise.all(promises)
 	}
-	async acknowledgeReport(uri) { // TODO: it might be better to have a function for emitting events to zhe ozone instance.
-		const res = await this.agent.app.bsky.feed.getPosts({
-			uris: [uri]
-		})
-		const promises = []
-		res.data.posts.forEach(post => {
-			if (!post.cid) return
-			const cid = post.cid
-			promises.push(this.agent.tools.ozone.moderation.emitEvent(
-				{
-					// specify the label event
-					event: {
-						$type: "tools.ozone.moderation.defs#modEventAcknowledge"
-					},
-					// specify the labeled post by strongRef
-					subject: {
-						$type: "com.atproto.repo.strongRef",
-						uri,
-						cid,
-					},
-					// put in the rest of the metadata
-					createdBy: this.agent.sessionManager.did,
-					createdAt: new Date().toISOString(),
-					subjectBlobCids: [],
-				},
-				{
-					encoding: "application/json",
-					headers: {
-						"atproto-proxy": `${this.labelerDID}#atproto_labeler`,
-					},
-				}
-			))
-		})
-		await Promise.all(promises)
+
+	async label(addLabels, negateLabels, uri) {
+		const event = {
+			$type: "tools.ozone.moderation.defs#modEventLabel",
+			createLabelVals: addLabels,
+			negateLabelVals: negateLabels,
+		}
+
+		await this.emitModerationEvent(uri, event)
+	}
+
+	async acknowledgeReport(uri) {
+		const event = {
+			$type: "tools.ozone.moderation.defs#modEventAcknowledge",
+		}
+
+		await this.emitModerationEvent(uri, event)
 	}
 	queryStatuses() {
 		return this.agent.tools.ozone.moderation.queryStatuses({
