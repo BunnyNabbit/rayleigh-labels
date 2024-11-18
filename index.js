@@ -9,7 +9,6 @@ class AgentP {
 		this.agent = new Agent(this.session)
 		this.ready = this.session.login({ identifier: handle, password }).then(() => {
 			this.agent.addLabeler(labelerDID)
-			console.log(this.agent)
 		})
 		this.labelerDID = labelerDID
 	}
@@ -125,7 +124,6 @@ app.post('/hydrateposts', async (req, res) => {
 	await agent.ready
 	for (let i = 0; i <= maxRetries; i++) {
 		try {
-			console.log(req.body)
 			const response = await agent.hydratePosts(req.body.uris)
 			res.json(response.data)
 			break
@@ -155,7 +153,6 @@ app.get('/getreports/', async (req, res) => {
 	for (let i = 0; i <= maxRetries; i++) {
 		try {
 			const statusResponse = await agent.queryStatuses(cursor)
-			console.log(statusResponse)
 			cursor = statusResponse.data.cursor
 			reports = reports.concat(statusResponse.data.subjectStatuses)
 			if (cursor) {
