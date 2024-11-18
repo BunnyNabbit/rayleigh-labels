@@ -114,7 +114,7 @@ function filterTransformEmbedTypes(posts) {
 
 async function populateQueue() {
 	const response = await api.getReports()
-	const uris = response.data.subjectStatuses.map(report => report.subject.uri).filter(element => element)
+	const uris = response.map(report => report.subject.uri).filter(element => element)
 	const promises = []
 	chunkArray(uris, API.bulkHydrateLimit).forEach(postChunk => {
 		const hydratePromise = api.hydratePosts(postChunk)

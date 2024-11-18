@@ -58,14 +58,16 @@ class AgentP {
 
 		await this.emitModerationEvent(uri, event)
 	}
-	queryStatuses() {
-		return this.agent.tools.ozone.moderation.queryStatuses({
+	queryStatuses(cursor) {
+		const body = {
 			limit: 100,
 			includeMuted: true,
 			sortField: "lastReportedAt",
 			sortDirection: "desc",
 			reviewState: "tools.ozone.moderation.defs#reviewOpen"
-		}, {
+		}
+		if (cursor) body.cursor = cursor
+		return this.agent.tools.ozone.moderation.queryStatuses(body, {
 			encoding: "application/json",
 			headers: {
 				"atproto-proxy": `${this.labelerDID}#atproto_labeler`,
@@ -142,15 +144,38 @@ app.post('/hydrateposts', async (req, res) => {
 
 app.get('/getreports/', async (req, res) => {
 	await agent.ready
+	let reports = []
+	function respond() {
+		res.json(reports)
+	}
+	function fail() {
+		res.status(500).json({ message: "Failed" })
+	}
+	let cursor = null
 	for (let i = 0; i <= maxRetries; i++) {
 		try {
-			const reports = await agent.queryStatuses()
-			res.json(reports)
-			break
+			const statusResponse = await agent.queryStatuses(cursor)
+			console.log(statusResponse)
+			cursor = statusResponse.data.cursor
+			reports = reports.concat(statusResponse.data.subjectStatuses)
+			if (cursor) {
+				if (i == maxRetries) {
+					respond()
+					break
+				}
+				continue
+			} else {
+				respond()
+				break
+			}
 		} catch (error) {
 			if (i === maxRetries) {
 				console.error(error)
-				res.status(500).json({ message: "Failed" })
+				if (reports.length) {
+					respond()
+				} else {
+					fail()
+				}
 			} else {
 				console.warn(`Attempt ${i + 1} failed, retrying...`)
 				await new Promise(resolve => setTimeout(resolve, 1000))
