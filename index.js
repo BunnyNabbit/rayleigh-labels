@@ -119,6 +119,7 @@ app.post('/addlabel/', async (req, res) => {
 })
 
 const maxRetries = 5
+const queuePages = 30
 
 app.post('/hydrateposts', async (req, res) => {
 	await agent.ready
@@ -150,13 +151,13 @@ app.get('/getreports/', async (req, res) => {
 		res.status(500).json({ message: "Failed" })
 	}
 	let cursor = null
-	for (let i = 0; i <= maxRetries; i++) {
+	for (let i = 0; i <= queuePages; i++) {
 		try {
 			const statusResponse = await agent.queryStatuses(cursor)
 			cursor = statusResponse.data.cursor
 			reports = reports.concat(statusResponse.data.subjectStatuses)
 			if (cursor) {
-				if (i == maxRetries) {
+				if (i == queuePages) {
 					respond()
 					break
 				}
@@ -166,7 +167,7 @@ app.get('/getreports/', async (req, res) => {
 				break
 			}
 		} catch (error) {
-			if (i === maxRetries) {
+			if (i === queuePages) {
 				console.error(error)
 				if (reports.length) {
 					respond()
