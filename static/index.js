@@ -143,7 +143,7 @@ function displayPost(post) {
 }
 
 function updatePositionIndicator(post) {
-	const text = `${currentPosition + 1}/${post.renderImages.length}`
+	const text = `${currentPosition + 1}/${post.renderImages.length} - ${queue.length}`
 	positionIndicatorElement.innerText = text
 }
 
