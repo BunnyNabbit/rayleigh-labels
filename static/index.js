@@ -103,11 +103,6 @@ function filterTransformEmbedTypes(posts) {
 				post.renderImages = post.embed.media.images
 			}
 		}
-		post.renderImages.forEach(media => {
-			setTimeout(() => {
-				preloadImage(media.fullsize)
-			}, 60000 * Math.random())
-		})
 	})
 	return filteredPosts
 }
@@ -231,6 +226,12 @@ class Control {
 		})
 		if (queue[0]) {
 			displayPost(queue[0])
+			// preload next post
+			if (queue[1]) {
+				queue[1].renderImages.forEach(media => {
+					preloadImage(media.fullsize)
+				})
+			}
 		} else {
 			currentPost = null
 			currentSubjectElement.src = placeholderImageUrl
