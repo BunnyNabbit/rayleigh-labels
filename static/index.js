@@ -181,7 +181,7 @@ class Control {
 			}
 			if (event.key == "Enter") {
 				this.next()
-			}			
+			}
 		})
 		let touchStartX = null
 		let touchStartY = null
