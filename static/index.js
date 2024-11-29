@@ -176,7 +176,7 @@ class Control {
 			}
 			if (event.key == "Enter") {
 				this.next()
-			}			
+			}
 		})
 		let touchStartX = null
 		let touchStartY = null
@@ -226,11 +226,14 @@ class Control {
 		})
 		if (queue[0]) {
 			displayPost(queue[0])
-			// preload next post
-			if (queue[1]) {
-				queue[1].renderImages.forEach(media => {
-					preloadImage(media.fullsize)
-				})
+			// preload next posts
+			for (let i = 1; i < 6; i++) {
+				if (queue[i] && !queue[i].preloaded) {
+					queue[i].preloaded = true
+					queue[i].renderImages.forEach(media => {
+						preloadImage(media.fullsize)
+					})
+				}
 			}
 		} else {
 			currentPost = null
