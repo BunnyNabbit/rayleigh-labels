@@ -122,10 +122,14 @@ async function populateQueue() {
 			})
 		})
 	})
+	Promise.allSettled(promises).then(() => {
+		queue = queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
+		.sort((a, b) => b.likeCount - a.likeCount)
+	})
 	return Promise.allSettled(promises)
 }
 
-const queue = []
+let queue = []
 let currentPost = null
 let currentPosition = 0
 let viewedAll = false
