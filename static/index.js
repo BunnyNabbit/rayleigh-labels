@@ -59,6 +59,31 @@ const DIRECTION = {
 	RIGHT: 1,
 	STILL: 0
 }
+class ToyNoises {
+	constructor() {
+		this.sfxrGenerationDegradation = 0
+		this.interval = setInterval(() => { this.sfxrGenerationDegradation = 1 }, 300)
+	}
+	playSound(sfxrPayload) {
+		if (!SoundEffect) return
+		this.sfxrGenerationDegradation += 0.1
+		let audio = new SoundEffect(sfxrPayload).parameters.mutate()
+		audio.sound_vol = (0.04 / this.sfxrGenerationDegradation) * 1.5
+		audio.sample_rate = Math.round((44100 / this.sfxrGenerationDegradation) * 1)
+		audio = new SoundEffect(audio).generate().getAudio()
+		audio.play()
+	}
+	destroy() {
+		clearInterval()
+	}
+	static sounds = {
+		lastInPost: "11111GvZH7jwT4FjsvL4Kt7D9TBj81nTkcvBs3VbcAfsTdCKdtFu6AmMN5iKGM55Y4cPxiz6SG7etbWKP2QkiVwBfo54smV8s9t7v37V7MT1vDs7CEjwSjSf",
+		hasLabel: "3Yw2CxDjPUsnbj3nAaw1boqFv8ordh7fvnYwRtUhUouLzXFrNBA8YeybkVQCnjpiXefXnmDMmdgzarbnuxdhmnXrNsnd99tdHiHZYYEAoFANNHyhiycwYCX8B",
+		addLabel: "34T6PktTUDAmJbCDoG4ZpNfWdzxkh2X7RQJBpEtRydQ6V21jpTtsGMGu4qDVioCHUeayPmzGf2HVzxQkUZkg5wpjHFJAWahbhYfaq9DefuN7uRYXsKmbcNWrT",
+		removeLabel: "34T6PktTUDAmJbCDoG4ZpNf1dUxfN4tkxPxnYkKQZWzNxssWrEzepcSwfgvdcdKmxF1a2EnN5C5RHHCviY45PniXkeZJTFbLfuZe8f4ohaAfVyoEpk5deUYEj"
+	}
+}
+const toyNoises = new ToyNoises()
 
 const currentSubjectElement = document.getElementById("currentSubject")
 const currentLabelsElement = document.getElementById("currentLabels")
@@ -147,7 +172,10 @@ function switchPostImage(direction = DIRECTION.STILL) {
 	const max = currentPost.renderImages.length - 1
 	const newPosition = currentPosition + direction
 	currentPosition = Math.max(Math.min(newPosition, max), 0)
-	if (currentPosition == max) viewedAll = true
+	if (currentPosition == max) {
+		viewedAll = true
+		toyNoises.playSound(ToyNoises.sounds.lastInPost)
+	}
 	const media = currentPost.renderImages[currentPosition]
 	currentSubjectElement.src = media.fullsize
 	currentSubjectElement.title = media.alt
@@ -159,10 +187,15 @@ function updateLabels(post) {
 	labelElements.forEach(labelElement => {
 		labelElement.checked = false
 	})
+	let hasLabel = false
 	post.labels.forEach(label => {
 		const labelElement = labelElements.find(element => element.id == label.val)
-		if (labelElement) labelElement.checked = true
+		if (labelElement) {
+			labelElement.checked = true
+			hasLabel = true
+		}
 	})
+	if (hasLabel) toyNoises.playSound(ToyNoises.sounds.hasLabel)
 }
 
 class Control {
