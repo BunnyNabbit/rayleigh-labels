@@ -12,6 +12,6 @@ Node.js should be installed prior to following these setup instructions.
 ## Usage
 The interface will emit events back to the labeling service when a post is acknowledged/labeled. Set a post's labels from the buttons on the top left area of the interface
 
-Keyboard: Left-right arrow keys to switch image in post and Enter to acknowledge/label. Label access keys may be implemented differently on browsers, but this is typically `Alt+KEY`.
+Keyboard: Left-right arrow keys to switch image in post and Enter to acknowledge/label. Label access keys may be implemented differently on browsers, but this is typically `Alt+KEY`. Backspace to show previously seen post.
 
-Touch gestures: Left-right to switch image in post and up to acknowledge/label.
+Touch gestures: Swipe left-right to switch image in post and up to acknowledge/label. Swipe down to show previously seen post.
