@@ -214,6 +214,9 @@ class Control {
 			if (event.key == "Enter") {
 				this.next()
 			}
+			if (event.key == "Backspace") {
+				this.previous()
+			}
 		})
 		let touchStartX = null
 		let touchStartY = null
@@ -238,11 +241,14 @@ class Control {
 			if (Math.abs(deltaY) > threshold && Math.abs(deltaX) < threshold) {
 				if (deltaY < 0) {
 					this.next()
+				} else {
+					this.previous()
 				}
 			}
 			touchStartX = null
 			touchStartY = null
 		})
+		this.backQueue = []
 	}
 	switchLeft() {
 		switchPostImage(DIRECTION.LEFT)
@@ -253,14 +259,17 @@ class Control {
 	next() {
 		if (!currentPost) return
 		if (!viewedAll) return switchPostImage(DIRECTION.RIGHT)
-		queue.shift()
-		const postLabels = currentPost.labels.filter(label => label.neg != true) // i forget if zhe appview hydrates negated labels or not. doing zhis just in case.
+		const post = queue.shift()
+		this.backQueue.push(post)
+		if (this.backQueue.length > Control.backQueueLimit) this.backQueue.shift()
+		const postLabels = currentPost.labels
 		const currentLabelValues = labelElements.map(element => { return { name: element.id, checked: element.checked } })
 		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
 		const negate = currentLabelValues.filter(currentValue => currentValue.checked == false && postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
 		api.label({
 			add, negate, uri: currentPost.uri
 		})
+		currentPost.labels = labelElements.filter(element => element.checked == true).map(element => { return { val: element.id } })
 		if (queue[0]) {
 			displayPost(queue[0])
 			// preload next posts
@@ -278,6 +287,14 @@ class Control {
 			getSet()
 		}
 	}
+	previous() {
+		if (!currentPost) return
+		if (!this.backQueue.length) return
+		queue.unshift(currentPost)
+		const post = this.backQueue.pop()
+		displayPost(post)
+	}
+	static backQueueLimit = 50
 }
 
 new Control()
