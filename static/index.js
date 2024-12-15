@@ -290,8 +290,8 @@ class Control {
 	previous() {
 		if (!currentPost) return
 		if (!this.backQueue.length) return
-		queue.unshift(currentPost)
 		const post = this.backQueue.pop()
+		queue.unshift(post)
 		displayPost(post)
 	}
 	static backQueueLimit = 50
