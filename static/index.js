@@ -93,9 +93,17 @@ const currentLabelsElement = document.getElementById("currentLabels")
 const positionIndicatorElement = document.getElementById("positionIndicator")
 const placeholderImageUrl = currentSubjectElement.src
 
-function preloadImage(url) {
-	const preloadImage = new Image()
-	preloadImage.src = url
+function preloadMedia(media) {
+	if (media.fullsize) {
+		const preloadImage = new Image()
+		preloadImage.src = media.fullsize
+	}
+	if (media.playlist) {
+		const video = document.createElement("video")
+		const preloadHls = new Hls()
+		preloadHls.loadSource(media.playlist)
+		preloadHls.attachMedia(video)
+	}
 }
 
 const api = new API()
@@ -295,7 +303,7 @@ class Control {
 				if (queue[i] && !queue[i].preloaded) {
 					queue[i].preloaded = true
 					queue[i].renderImages.forEach(media => {
-						preloadImage(media.fullsize)
+						preloadMedia(media)
 					})
 				}
 			}
@@ -356,7 +364,7 @@ api.getLabels().then(labels => {
 })
 
 // play sound on video load
-currentVideoSubjectElement.addEventListener('loadeddata', function() {
+currentVideoSubjectElement.addEventListener('loadeddata', function () {
 	toyNoises.playSound(ToyNoises.sounds.videoLoad)
 }, false)
 
