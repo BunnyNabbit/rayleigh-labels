@@ -86,6 +86,8 @@ class ToyNoises {
 const toyNoises = new ToyNoises()
 
 const currentSubjectElement = document.getElementById("currentSubject")
+const currentVideoSubjectElement = document.getElementById("currentVideoSubject")
+const hls = new Hls()
 const currentLabelsElement = document.getElementById("currentLabels")
 const positionIndicatorElement = document.getElementById("positionIndicator")
 const placeholderImageUrl = currentSubjectElement.src
@@ -112,7 +114,7 @@ function chunkArray(array, number) {
 }
 
 function filterTransformEmbedTypes(posts) {
-	const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view"]
+	const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view", "app.bsky.embed.video#view"]
 	console.log("posts", posts)
 	const filteredPosts = posts.filter(post => {
 		return post.embed && supportedTypes.includes(post.embed["$type"])
@@ -127,6 +129,9 @@ function filterTransformEmbedTypes(posts) {
 			if (post.embed.media["$type"] == "app.bsky.embed.images#view") {
 				post.renderImages = post.embed.media.images
 			}
+		}
+		if (type == "app.bsky.embed.video#view") {
+			post.renderImages = [post.embed]
 		}
 	})
 	return filteredPosts
@@ -181,9 +186,21 @@ function switchPostImage(direction = DIRECTION.STILL) {
 		toyNoises.playSound(ToyNoises.sounds.lastInPost)
 	}
 	const media = currentPost.renderImages[currentPosition]
+	if (media.playlist) {
+		currentVideoSubjectElement.classList.remove("hidden")
+		currentSubjectElement.classList.add("hidden")
+		hls.loadSource(media.playlist)
+		hls.attachMedia(currentVideoSubjectElement)
+		currentVideoSubjectElement.title = media.alt
+		currentVideoSubjectElement.alt = media.alt
+	} else {
+		currentVideoSubjectElement.classList.add("hidden")
+		currentSubjectElement.classList.remove("hidden")
 	currentSubjectElement.src = media.fullsize
 	currentSubjectElement.title = media.alt
 	currentSubjectElement.alt = media.alt
+	}
+
 	updatePositionIndicator(currentPost)
 }
 
