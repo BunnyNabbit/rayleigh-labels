@@ -196,9 +196,9 @@ function switchPostImage(direction = DIRECTION.STILL) {
 	} else {
 		currentVideoSubjectElement.classList.add("hidden")
 		currentSubjectElement.classList.remove("hidden")
-	currentSubjectElement.src = media.fullsize
-	currentSubjectElement.title = media.alt
-	currentSubjectElement.alt = media.alt
+		currentSubjectElement.src = media.fullsize
+		currentSubjectElement.title = media.alt
+		currentSubjectElement.alt = media.alt
 	}
 
 	updatePositionIndicator(currentPost)
