@@ -80,19 +80,30 @@ class ToyNoises {
 		lastInPost: "11111GvZH7jwT4FjsvL4Kt7D9TBj81nTkcvBs3VbcAfsTdCKdtFu6AmMN5iKGM55Y4cPxiz6SG7etbWKP2QkiVwBfo54smV8s9t7v37V7MT1vDs7CEjwSjSf",
 		hasLabel: "3Yw2CxDjPUsnbj3nAaw1boqFv8ordh7fvnYwRtUhUouLzXFrNBA8YeybkVQCnjpiXefXnmDMmdgzarbnuxdhmnXrNsnd99tdHiHZYYEAoFANNHyhiycwYCX8B",
 		addLabel: "34T6PktTUDAmJbCDoG4ZpNfWdzxkh2X7RQJBpEtRydQ6V21jpTtsGMGu4qDVioCHUeayPmzGf2HVzxQkUZkg5wpjHFJAWahbhYfaq9DefuN7uRYXsKmbcNWrT",
-		removeLabel: "34T6PktTUDAmJbCDoG4ZpNf1dUxfN4tkxPxnYkKQZWzNxssWrEzepcSwfgvdcdKmxF1a2EnN5C5RHHCviY45PniXkeZJTFbLfuZe8f4ohaAfVyoEpk5deUYEj"
+		removeLabel: "34T6PktTUDAmJbCDoG4ZpNf1dUxfN4tkxPxnYkKQZWzNxssWrEzepcSwfgvdcdKmxF1a2EnN5C5RHHCviY45PniXkeZJTFbLfuZe8f4ohaAfVyoEpk5deUYEj",
+		videoLoad: "57uBnWWjHLipzPva3aWuvVAKjtNZVqPXK1rgnULF75gk39WvWUNqpZbnQmQj3NPQwkcUQ6VQkHGpYb4s6vJvXNX27gzA9ibekarmFqKXYQfmhKQuffiEidF35"
 	}
 }
 const toyNoises = new ToyNoises()
 
 const currentSubjectElement = document.getElementById("currentSubject")
+const currentVideoSubjectElement = document.getElementById("currentVideoSubject")
+const hls = new Hls()
 const currentLabelsElement = document.getElementById("currentLabels")
 const positionIndicatorElement = document.getElementById("positionIndicator")
 const placeholderImageUrl = currentSubjectElement.src
 
-function preloadImage(url) {
-	const preloadImage = new Image()
-	preloadImage.src = url
+function preloadMedia(media) {
+	if (media.fullsize) {
+		const preloadImage = new Image()
+		preloadImage.src = media.fullsize
+	}
+	if (media.playlist) {
+		const video = document.createElement("video")
+		const preloadHls = new Hls()
+		preloadHls.loadSource(media.playlist)
+		preloadHls.attachMedia(video)
+	}
 }
 
 const api = new API()
@@ -112,7 +123,7 @@ function chunkArray(array, number) {
 }
 
 function filterTransformEmbedTypes(posts) {
-	const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view"]
+	const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view", "app.bsky.embed.video#view"]
 	console.log("posts", posts)
 	const filteredPosts = posts.filter(post => {
 		return post.embed && supportedTypes.includes(post.embed["$type"])
@@ -127,6 +138,9 @@ function filterTransformEmbedTypes(posts) {
 			if (post.embed.media["$type"] == "app.bsky.embed.images#view") {
 				post.renderImages = post.embed.media.images
 			}
+		}
+		if (type == "app.bsky.embed.video#view") {
+			post.renderImages = [post.embed]
 		}
 	})
 	return filteredPosts
@@ -181,9 +195,21 @@ function switchPostImage(direction = DIRECTION.STILL) {
 		toyNoises.playSound(ToyNoises.sounds.lastInPost)
 	}
 	const media = currentPost.renderImages[currentPosition]
-	currentSubjectElement.src = media.fullsize
-	currentSubjectElement.title = media.alt
-	currentSubjectElement.alt = media.alt
+	if (media.playlist) {
+		currentVideoSubjectElement.classList.remove("hidden")
+		currentSubjectElement.classList.add("hidden")
+		hls.loadSource(media.playlist)
+		hls.attachMedia(currentVideoSubjectElement)
+		currentVideoSubjectElement.title = media.alt
+		currentVideoSubjectElement.alt = media.alt
+	} else {
+		currentVideoSubjectElement.classList.add("hidden")
+		currentSubjectElement.classList.remove("hidden")
+		currentSubjectElement.src = media.fullsize
+		currentSubjectElement.title = media.alt
+		currentSubjectElement.alt = media.alt
+	}
+
 	updatePositionIndicator(currentPost)
 }
 
@@ -277,7 +303,7 @@ class Control {
 				if (queue[i] && !queue[i].preloaded) {
 					queue[i].preloaded = true
 					queue[i].renderImages.forEach(media => {
-						preloadImage(media.fullsize)
+						preloadMedia(media)
 					})
 				}
 			}
@@ -336,6 +362,11 @@ api.getLabels().then(labels => {
 	// populate queue
 	getSet()
 })
+
+// play sound on video load
+currentVideoSubjectElement.addEventListener('loadeddata', function () {
+	toyNoises.playSound(ToyNoises.sounds.videoLoad)
+}, false)
 
 function getSet() {
 	populateQueue().then(() => {
