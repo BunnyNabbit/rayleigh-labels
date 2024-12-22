@@ -202,6 +202,11 @@ function switchPostImage(direction = DIRECTION.STILL) {
 		viewedAll = true
 		toyNoises.playSound(ToyNoises.sounds.lastInPost)
 	}
+	if (currentVideoSubjectElement) {
+		currentVideoSubjectElement.classList.add("hidden")
+		currentVideoSubjectElement.pause()
+		currentVideoSubjectElement = null
+	}
 	const media = currentPost.renderImages[currentPosition]
 	if (media.playlist) {
 		if (!media.videoCache) preloadMedia(media)
@@ -215,11 +220,6 @@ function switchPostImage(direction = DIRECTION.STILL) {
 		}
 		currentVideoSubjectElement = video
 	} else {
-		if (currentVideoSubjectElement) {
-			currentVideoSubjectElement.classList.add("hidden")
-			currentVideoSubjectElement.pause()
-			currentVideoSubjectElement = null
-		}
 		currentSubjectElement.classList.remove("hidden")
 		currentSubjectElement.src = media.fullsize
 		currentSubjectElement.title = media.alt
