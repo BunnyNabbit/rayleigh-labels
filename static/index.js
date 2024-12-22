@@ -80,19 +80,37 @@ class ToyNoises {
 		lastInPost: "11111GvZH7jwT4FjsvL4Kt7D9TBj81nTkcvBs3VbcAfsTdCKdtFu6AmMN5iKGM55Y4cPxiz6SG7etbWKP2QkiVwBfo54smV8s9t7v37V7MT1vDs7CEjwSjSf",
 		hasLabel: "3Yw2CxDjPUsnbj3nAaw1boqFv8ordh7fvnYwRtUhUouLzXFrNBA8YeybkVQCnjpiXefXnmDMmdgzarbnuxdhmnXrNsnd99tdHiHZYYEAoFANNHyhiycwYCX8B",
 		addLabel: "34T6PktTUDAmJbCDoG4ZpNfWdzxkh2X7RQJBpEtRydQ6V21jpTtsGMGu4qDVioCHUeayPmzGf2HVzxQkUZkg5wpjHFJAWahbhYfaq9DefuN7uRYXsKmbcNWrT",
-		removeLabel: "34T6PktTUDAmJbCDoG4ZpNf1dUxfN4tkxPxnYkKQZWzNxssWrEzepcSwfgvdcdKmxF1a2EnN5C5RHHCviY45PniXkeZJTFbLfuZe8f4ohaAfVyoEpk5deUYEj"
+		removeLabel: "34T6PktTUDAmJbCDoG4ZpNf1dUxfN4tkxPxnYkKQZWzNxssWrEzepcSwfgvdcdKmxF1a2EnN5C5RHHCviY45PniXkeZJTFbLfuZe8f4ohaAfVyoEpk5deUYEj",
+		videoLoad: "57uBnWWjHLipzPva3aWuvVAKjtNZVqPXK1rgnULF75gk39WvWUNqpZbnQmQj3NPQwkcUQ6VQkHGpYb4s6vJvXNX27gzA9ibekarmFqKXYQfmhKQuffiEidF35"
 	}
 }
 const toyNoises = new ToyNoises()
 
 const currentSubjectElement = document.getElementById("currentSubject")
+const subjectDisplayDiv = document.getElementById("subjectDisplay")
+const hls = new Hls()
 const currentLabelsElement = document.getElementById("currentLabels")
 const positionIndicatorElement = document.getElementById("positionIndicator")
 const placeholderImageUrl = currentSubjectElement.src
 
-function preloadImage(url) {
-	const preloadImage = new Image()
-	preloadImage.src = url
+function preloadMedia(media) {
+	if (media.fullsize) {
+		const preloadImage = new Image()
+		preloadImage.src = media.fullsize
+	}
+	if (media.playlist) {
+		const video = document.createElement("video")
+		video.classList.add("hidden")
+		video.autoplay = false
+		video.loop = true
+		video.muted = true
+		video.classList.add("fullscreen-image")
+		const preloadHls = new Hls()
+		preloadHls.loadSource(media.playlist)
+		preloadHls.attachMedia(video)
+		subjectDisplayDiv.appendChild(video)
+		media.videoCache = video
+	}
 }
 
 const api = new API()
@@ -112,7 +130,7 @@ function chunkArray(array, number) {
 }
 
 function filterTransformEmbedTypes(posts) {
-	const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view"]
+	const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view", "app.bsky.embed.video#view"]
 	console.log("posts", posts)
 	const filteredPosts = posts.filter(post => {
 		return post.embed && supportedTypes.includes(post.embed["$type"])
@@ -127,6 +145,9 @@ function filterTransformEmbedTypes(posts) {
 			if (post.embed.media["$type"] == "app.bsky.embed.images#view") {
 				post.renderImages = post.embed.media.images
 			}
+		}
+		if (type == "app.bsky.embed.video#view") {
+			post.renderImages = [post.embed]
 		}
 	})
 	return filteredPosts
@@ -149,7 +170,7 @@ async function populateQueue() {
 	})
 	Promise.allSettled(promises).then(() => {
 		queue = queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
-		.sort((a, b) => b.likeCount - a.likeCount)
+			.sort((a, b) => b.likeCount - a.likeCount)
 	})
 	return Promise.allSettled(promises)
 }
@@ -171,6 +192,7 @@ function updatePositionIndicator(post) {
 	positionIndicatorElement.innerText = text
 }
 
+let currentVideoSubjectElement = null
 function switchPostImage(direction = DIRECTION.STILL) {
 	if (!currentPost) return
 	const max = currentPost.renderImages.length - 1
@@ -180,10 +202,30 @@ function switchPostImage(direction = DIRECTION.STILL) {
 		viewedAll = true
 		toyNoises.playSound(ToyNoises.sounds.lastInPost)
 	}
+	if (currentVideoSubjectElement) {
+		currentVideoSubjectElement.classList.add("hidden")
+		currentVideoSubjectElement.pause()
+		currentVideoSubjectElement = null
+	}
 	const media = currentPost.renderImages[currentPosition]
-	currentSubjectElement.src = media.fullsize
-	currentSubjectElement.title = media.alt
-	currentSubjectElement.alt = media.alt
+	if (media.playlist) {
+		if (!media.videoCache) preloadMedia(media)
+		const video = media.videoCache
+		currentSubjectElement.classList.add("hidden")
+		video.classList.remove("hidden")
+		video.play()
+		if (media.alt) {
+			video.title = media.alt
+			video.alt = media.alt
+		}
+		currentVideoSubjectElement = video
+	} else {
+		currentSubjectElement.classList.remove("hidden")
+		currentSubjectElement.src = media.fullsize
+		currentSubjectElement.title = media.alt
+		currentSubjectElement.alt = media.alt
+	}
+
 	updatePositionIndicator(currentPost)
 }
 
@@ -261,7 +303,10 @@ class Control {
 		if (!viewedAll) return switchPostImage(DIRECTION.RIGHT)
 		const post = queue.shift()
 		this.backQueue.push(post)
-		if (this.backQueue.length > Control.backQueueLimit) this.backQueue.shift()
+		if (this.backQueue.length > Control.backQueueLimit) {
+			const removedPost = this.backQueue.shift()
+			if (removedPost.renderImages[0].videoCache) removedPost.renderImages[0].videoCache.remove()
+		}
 		const postLabels = currentPost.labels
 		const currentLabelValues = labelElements.map(element => { return { name: element.id, checked: element.checked } })
 		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
@@ -277,7 +322,7 @@ class Control {
 				if (queue[i] && !queue[i].preloaded) {
 					queue[i].preloaded = true
 					queue[i].renderImages.forEach(media => {
-						preloadImage(media.fullsize)
+						preloadMedia(media)
 					})
 				}
 			}
@@ -336,6 +381,7 @@ api.getLabels().then(labels => {
 	// populate queue
 	getSet()
 })
+
 
 function getSet() {
 	populateQueue().then(() => {

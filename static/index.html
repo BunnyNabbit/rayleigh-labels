@@ -81,14 +81,20 @@
 			/* background-color: #e0e0e0; */
 			opacity: 1;
 		}
+
+		.hidden {
+			display: none;
+		}
 	</style>
 	<script src="/vendor/riffwave.js"></script>
 	<script async src="/vendor/sfxr.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
 </head>
 
 <body>
-	<div>
+	<div id="subjectDisplay">
 		<img id="currentSubject" class="fullscreen-image" src="/placeholder/aon-drone.png">
+		<video controls autoplay loop muted id="currentVideoSubject" class="fullscreen-image hidden"></video>
 	</div>
 	<div id="currentLabels" class="current-labels font">
 		<input id="aidan" type="checkbox" accesskey="1">
