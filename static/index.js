@@ -87,7 +87,7 @@ class ToyNoises {
 const toyNoises = new ToyNoises()
 
 const currentSubjectElement = document.getElementById("currentSubject")
-const currentVideoSubjectElement = document.getElementById("currentVideoSubject")
+const subjectDisplayDiv = document.getElementById("subjectDisplay")
 const hls = new Hls()
 const currentLabelsElement = document.getElementById("currentLabels")
 const positionIndicatorElement = document.getElementById("positionIndicator")
@@ -100,9 +100,16 @@ function preloadMedia(media) {
 	}
 	if (media.playlist) {
 		const video = document.createElement("video")
+		video.classList.add("hidden")
+		video.autoplay = false
+		video.loop = true
+		video.muted = true
+		video.classList.add("fullscreen-image")
 		const preloadHls = new Hls()
 		preloadHls.loadSource(media.playlist)
 		preloadHls.attachMedia(video)
+		subjectDisplayDiv.appendChild(video)
+		media.videoCache = video
 	}
 }
 
@@ -163,7 +170,7 @@ async function populateQueue() {
 	})
 	Promise.allSettled(promises).then(() => {
 		queue = queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
-		.sort((a, b) => b.likeCount - a.likeCount)
+			.sort((a, b) => b.likeCount - a.likeCount)
 	})
 	return Promise.allSettled(promises)
 }
@@ -185,6 +192,7 @@ function updatePositionIndicator(post) {
 	positionIndicatorElement.innerText = text
 }
 
+let currentVideoSubjectElement = null
 function switchPostImage(direction = DIRECTION.STILL) {
 	if (!currentPost) return
 	const max = currentPost.renderImages.length - 1
@@ -196,14 +204,22 @@ function switchPostImage(direction = DIRECTION.STILL) {
 	}
 	const media = currentPost.renderImages[currentPosition]
 	if (media.playlist) {
-		currentVideoSubjectElement.classList.remove("hidden")
+		if (!media.videoCache) preloadMedia(media)
+		const video = media.videoCache
 		currentSubjectElement.classList.add("hidden")
-		hls.loadSource(media.playlist)
-		hls.attachMedia(currentVideoSubjectElement)
-		currentVideoSubjectElement.title = media.alt
-		currentVideoSubjectElement.alt = media.alt
+		video.classList.remove("hidden")
+		video.play()
+		if (media.alt) {
+			video.title = media.alt
+			video.alt = media.alt
+		}
+		currentVideoSubjectElement = video
 	} else {
-		currentVideoSubjectElement.classList.add("hidden")
+		if (currentVideoSubjectElement) {
+			currentVideoSubjectElement.classList.add("hidden")
+			currentVideoSubjectElement.pause()
+			currentVideoSubjectElement = null
+		}
 		currentSubjectElement.classList.remove("hidden")
 		currentSubjectElement.src = media.fullsize
 		currentSubjectElement.title = media.alt
@@ -287,7 +303,10 @@ class Control {
 		if (!viewedAll) return switchPostImage(DIRECTION.RIGHT)
 		const post = queue.shift()
 		this.backQueue.push(post)
-		if (this.backQueue.length > Control.backQueueLimit) this.backQueue.shift()
+		if (this.backQueue.length > Control.backQueueLimit) {
+			const removedPost = this.backQueue.shift()
+			if (removedPost.renderImages[0].videoCache) removedPost.renderImages[0].videoCache.remove()
+		}
 		const postLabels = currentPost.labels
 		const currentLabelValues = labelElements.map(element => { return { name: element.id, checked: element.checked } })
 		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
@@ -363,10 +382,6 @@ api.getLabels().then(labels => {
 	getSet()
 })
 
-// play sound on video load
-currentVideoSubjectElement.addEventListener('loadeddata', function () {
-	toyNoises.playSound(ToyNoises.sounds.videoLoad)
-}, false)
 
 function getSet() {
 	populateQueue().then(() => {
