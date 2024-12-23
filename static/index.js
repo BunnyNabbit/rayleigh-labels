@@ -214,6 +214,8 @@ function switchPostImage(direction = DIRECTION.STILL) {
 		currentSubjectElement.classList.add("hidden")
 		video.classList.remove("hidden")
 		video.play()
+		video.playbackRate = 2
+		video.controls = true
 		if (media.alt) {
 			video.title = media.alt
 			video.alt = media.alt
