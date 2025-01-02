@@ -145,6 +145,9 @@ function filterTransformEmbedTypes(posts) {
 			if (post.embed.media["$type"] == "app.bsky.embed.images#view") {
 				post.renderImages = post.embed.media.images
 			}
+			if (post.embed.media["$type"] == "app.bsky.embed.video#view") {
+				post.renderImages = [post.embed.media]
+			}
 		}
 		if (type == "app.bsky.embed.video#view") {
 			post.renderImages = [post.embed]
