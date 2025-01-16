@@ -110,6 +110,7 @@ function preloadMedia(media) {
 		preloadHls.attachMedia(video)
 		subjectDisplayDiv.appendChild(video)
 		media.videoCache = video
+		media.hls = preloadHls
 	}
 }
 
@@ -310,7 +311,13 @@ class Control {
 		this.backQueue.push(post)
 		if (this.backQueue.length > Control.backQueueLimit) {
 			const removedPost = this.backQueue.shift()
-			if (removedPost.renderImages[0].videoCache) removedPost.renderImages[0].videoCache.remove()
+			if (removedPost.renderImages[0].videoCache) {
+				removedPost.renderImages[0].videoCache.remove()
+				// Destroy HLS context
+				if (removedPost.renderImages[0].hls) {
+					removedPost.renderImages[0].hls.destroy()
+				}
+			}
 		}
 		const postLabels = currentPost.labels
 		const currentLabelValues = labelElements.map(element => { return { name: element.id, checked: element.checked } })
