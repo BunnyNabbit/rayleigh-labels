@@ -1,3 +1,5 @@
+const { SoundEffect, sfxr } = require("./vendor/sfxr.js")
+require("./importAssetsHack.js")
 class API {
 	constructor() {
 	}
@@ -42,13 +44,8 @@ class API {
 		})
 	}
 	getLabels() {
-		return fetch("/labels.json").then(response => {
-			if (!response.ok) {
-				throw new Error("HTTP error " + response.status);
-			}
-			return response.json()
-		}).then(json => {
-			return json
+		return new Promise(resolve => {
+			resolve(require("../labels.json"))
 		})
 	}
 	static bulkHydrateLimit = 25
