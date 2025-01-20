@@ -2,7 +2,7 @@ const express = require('express')
 const { CredentialSession, Agent } = require("@atproto/api")
 const app = express()
 const port = 3213
-app.use('/', express.static(require("path").join(__dirname, "static")))
+app.use('/', express.static(require("path").join(__dirname, "web")))
 class AgentP {
 	constructor(handle, password, labelerDID) {
 		this.session = new CredentialSession("https://bsky.social")
