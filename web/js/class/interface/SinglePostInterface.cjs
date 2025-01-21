@@ -41,6 +41,17 @@ class SinglePostInterface {
 		this.currentLabelsElement = document.getElementById("currentLabels")
 		this.positionIndicatorElement = document.getElementById("positionIndicator")
 		this.placeholderImageUrl = this.currentSubjectElement.src
+		// controls
+		this.control = new InputControls(postQueue)
+		this.control.on("switchPostImage", (direction) => {
+			this.switchPostImage(direction)
+		})
+		this.control.on("next", () => {
+			this.postQueue.next()
+		})
+		this.control.on("previous", () => {
+			this.postQueue.previous()
+		})
 	}
 	displayPost(post) {
 		this.postQueue.viewedAll = false

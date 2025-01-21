@@ -48,6 +48,54 @@ class PostQueue {
 		return Promise.allSettled(promises)
 	}
 
+	next() {
+		if (!this.currentPost) return
+		if (!this.viewedAll) return this.interface.switchPostImage(InputControls.DIRECTION.RIGHT)
+		const post = this.queue.shift()
+		this.backQueue.push(post)
+		if (this.backQueue.length > PostQueue.backQueueLimit) {
+			const removedPost = this.backQueue.shift()
+			if (removedPost.renderImages[0].videoCache) {
+				removedPost.renderImages[0].videoCache.remove()
+				// Destroy HLS context
+				if (removedPost.renderImages[0].hls) {
+					removedPost.renderImages[0].hls.destroy()
+				}
+			}
+		}
+		const postLabels = this.currentPost.labels
+		const currentLabelValues = this.interface.labelElements.map(element => { return { name: element.id, checked: element.checked } })
+		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
+		const negate = currentLabelValues.filter(currentValue => currentValue.checked == false && postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
+		this.api.label({
+			add, negate, uri: this.currentPost.uri
+		})
+		this.currentPost.labels = this.interface.labelElements.filter(element => element.checked == true).map(element => { return { val: element.id } })
+		if (this.queue[0]) {
+			this.interface.displayPost(this.queue[0])
+			// preload next posts
+			for (let i = 1; i < 6; i++) {
+				if (this.queue[i] && !this.queue[i].preloaded) {
+					this.queue[i].preloaded = true
+					this.queue[i].renderImages.forEach(media => {
+						this.interface.preloadMedia(media)
+					})
+				}
+			}
+		} else {
+			this.currentPost = null
+			this.interface.currentSubjectElement.src = this.interface.placeholderImageUrl
+			this.getSet()
+		}
+	}
+	previous() {
+		if (!this.currentPost) return
+		if (!this.backQueue.length) return
+		const post = this.backQueue.pop()
+		this.queue.unshift(post)
+		this.interface.displayPost(post)
+	}
+
 	static filterTransformEmbedTypes(posts) {
 		const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view", "app.bsky.embed.video#view"]
 		console.log("posts", posts)
