@@ -49,14 +49,14 @@ class InputControls {
 		})
 	}
 	switchLeft() {
-		this.postQueue.switchPostImage(InputControls.DIRECTION.LEFT)
+		this.postQueue.interface.switchPostImage(InputControls.DIRECTION.LEFT)
 	}
 	switchRight() {
-		this.postQueue.switchPostImage(InputControls.DIRECTION.RIGHT)
+		this.postQueue.interface.switchPostImage(InputControls.DIRECTION.RIGHT)
 	}
 	next() {
 		if (!this.postQueue.currentPost) return
-		if (!this.postQueue.viewedAll) return this.postQueue.switchPostImage(InputControls.DIRECTION.RIGHT)
+		if (!this.postQueue.viewedAll) return this.postQueue.interface.switchPostImage(InputControls.DIRECTION.RIGHT)
 		const post = this.postQueue.queue.shift()
 		this.postQueue.backQueue.push(post)
 		if (this.postQueue.backQueue.length > PostQueue.backQueueLimit) {
@@ -70,27 +70,27 @@ class InputControls {
 			}
 		}
 		const postLabels = this.postQueue.currentPost.labels
-		const currentLabelValues = this.postQueue.labelElements.map(element => { return { name: element.id, checked: element.checked } })
+		const currentLabelValues = this.postQueue.interface.labelElements.map(element => { return { name: element.id, checked: element.checked } })
 		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
 		const negate = currentLabelValues.filter(currentValue => currentValue.checked == false && postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
 		this.postQueue.api.label({
 			add, negate, uri: this.postQueue.currentPost.uri
 		})
-		this.postQueue.currentPost.labels = this.postQueue.labelElements.filter(element => element.checked == true).map(element => { return { val: element.id } })
+		this.postQueue.currentPost.labels = this.postQueue.interface.labelElements.filter(element => element.checked == true).map(element => { return { val: element.id } })
 		if (this.postQueue.queue[0]) {
-			this.postQueue.displayPost(this.postQueue.queue[0])
+			this.postQueue.interface.displayPost(this.postQueue.queue[0])
 			// preload next posts
 			for (let i = 1; i < 6; i++) {
 				if (this.postQueue.queue[i] && !this.postQueue.queue[i].preloaded) {
 					this.postQueue.queue[i].preloaded = true
 					this.postQueue.queue[i].renderImages.forEach(media => {
-						this.postQueue.preloadMedia(media)
+						this.postQueue.interface.preloadMedia(media)
 					})
 				}
 			}
 		} else {
 			this.postQueue.currentPost = null
-			this.postQueue.currentSubjectElement.src = this.postQueue.placeholderImageUrl
+			this.postQueue.interface.currentSubjectElement.src = this.postQueue.interface.placeholderImageUrl
 			this.postQueue.getSet()
 		}
 	}
@@ -99,7 +99,7 @@ class InputControls {
 		if (!this.postQueue.backQueue.length) return
 		const post = this.postQueue.backQueue.pop()
 		this.postQueue.queue.unshift(post)
-		this.postQueue.displayPost(post)
+		this.postQueue.interface.displayPost(post)
 	}
 	static DIRECTION = {
 		LEFT: -1,
