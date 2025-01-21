@@ -12,8 +12,11 @@
   "author": "BunnyNabbit",
   "license": "MIT",
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
     "autoprefixer": "^10.4.20",
     "css-loader": "^6.11.0",
+    "eslint": "^9.18.0",
+    "globals": "^15.14.0",
     "html-webpack-plugin": "^5.6.3",
     "postcss-loader": "^8.1.1",
     "sass": "^1.82.0",
@@ -25,6 +28,7 @@
   },
   "dependencies": {
     "@atproto/api": "^0.13.12",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "hls.js": "^1.5.19"
   }
 }
