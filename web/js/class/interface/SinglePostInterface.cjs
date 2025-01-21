@@ -1,5 +1,5 @@
-const ToyNoises = require("./sound/ToyNoises.cjs")
-const InputControls = require("./InputControls.cjs")
+const ToyNoises = require("../sound/ToyNoises.cjs")
+const InputControls = require("../InputControls.cjs")
 const Hls = require("hls.js")
 
 class SinglePostInterface {
@@ -7,7 +7,6 @@ class SinglePostInterface {
 		this.postQueue = postQueue
 		this.postQueue.interface = this
 		this.toyNoises = toyNoises
-		this.control = new InputControls(postQueue)
 		this.currentPosition = 0
 		this.currentVideoSubjectElement = null
 		// populate labels
