@@ -10,7 +10,7 @@ const SinglePostInterface = require("./class/interface/SinglePostInterface.cjs")
 
 const configurationModal = new ConfigurationModal()
 let toyNoises = new NullNoises()
-if (configurationModal.getSetting("noises") == "on") toyNoises = new ToyNoises()
+if (configurationModal.getSetting("noises") == true) toyNoises = new ToyNoises()
 configurationModal.toyNoises = toyNoises
 const api = new API()
 const postQueue = new PostQueue(api)

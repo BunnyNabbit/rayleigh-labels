@@ -100,6 +100,13 @@ class BooleanSetting extends Setting {
 			label, input: inputElement
 		}
 	}
+	save() {
+		localStorage.setItem(Setting.keyPrefix + this.id, this.input.checked)
+	}
+	load() {
+		if (localStorage.getItem(Setting.keyPrefix + this.id) == null) return null
+		return localStorage.getItem(Setting.keyPrefix + this.id) === "true"
+	}
 }
 
 class SelectSetting extends Setting {
@@ -196,8 +203,8 @@ class ConfigurationModal extends BaseMenuModal {
 		this.addSetting(new BooleanSetting("unmuteVideos", "Unmute videos", false))
 		this.addSetting(new TextSetting("blurLabels", "Blur labels (Comma separated)", "!hide,!warn"))
 		this.addSetting(new Text("Some settings may require a page refresh to apply."))
-		// Restrained Rayleigh. Use localStorage.setItem(`rayleighSetting:restraints`, "on") to enable
-		if (localStorage.getItem(`${Setting.keyPrefix}restraints`) == "on") { // a bit hacky, since a setting cannot be accessed if it doesn't exist
+		// Restrained Rayleigh. Use localStorage.setItem(`rayleighSetting:restraints`, "true") to enable
+		if (localStorage.getItem(`${Setting.keyPrefix}restraints`) == "true") { // a bit hacky, since a setting cannot be accessed if it doesn't exist
 			this.addSetting(new Divider())
 			this.addSetting(new Header("Restrained Rayleigh", 2))
 			this.addSetting(new Text("RR is an experimental tool. Use of restraints may not be suitable for some users."))
@@ -223,7 +230,7 @@ class ConfigurationModal extends BaseMenuModal {
 			const { label, input } = setting.createInputElement()
 			if (input) {
 				input.onchange = () => {
-					setting.value = input.value
+					setting.value = input.value ?? input.checked
 					setting.save()
 					this.toyNoises.playSound(ToyNoises.sounds.addLabel)
 					if (setting.options?.requiresReload) {
