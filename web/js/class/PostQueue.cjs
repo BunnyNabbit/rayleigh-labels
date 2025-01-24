@@ -1,5 +1,6 @@
 const API = require("./API.cjs")
 const { randomIntFromInterval, chunkArray } = require("../utils.cjs")
+const InputControls = require("./InputControls.cjs")
 
 class PostQueue {
 	constructor(api) {
@@ -9,8 +10,6 @@ class PostQueue {
 		this.currentPost = null
 		this.viewedAll = false
 		this.interface = null
-		// populate queue
-		this.getSet()
 	}
 	// Get the next set of posts
 	getSet() {
@@ -28,6 +27,11 @@ class PostQueue {
 
 	async populateQueue() {
 		const response = await this.api.getReports()
+		const tagUriCache = new Set()
+		response.forEach(report => {
+			if (report.tags.some(tag => tag.startsWith("det:"))) tagUriCache.add(report.subject.uri)
+		})
+		let tmp = []
 		const uris = response.map(report => report.subject.uri).filter(element => element)
 		const promises = []
 		chunkArray(uris, API.bulkHydrateLimit).forEach(postChunk => {
@@ -36,7 +40,11 @@ class PostQueue {
 			hydratePromise.then(response => {
 				const posts = response.posts
 				const filteredPosts = PostQueue.filterTransformEmbedTypes(posts)
+				const missingUris = postChunk.filter(uri => !posts.some(post => post.uri == uri))
+				tmp = tmp.concat(missingUris.filter(uri => uri.includes("/app.bsky.feed.post/")))
+				console.log({ missingUris: tmp.join(",") })
 				filteredPosts.forEach(post => {
+					post.tagged = tagUriCache.has(post.uri)
 					this.queue.push(post)
 				})
 			})

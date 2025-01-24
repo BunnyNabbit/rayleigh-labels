@@ -135,6 +135,9 @@ class SinglePostInterface {
 		})
 		if (hasLabel) this.toyNoises.playSound(ToyNoises.sounds.hasLabel)
 	}
+	open() {
+		this.postQueue.getSet()
+	}
 }
 
 module.exports = SinglePostInterface

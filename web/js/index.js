@@ -1,8 +1,21 @@
+
+require("./importAssetsHack.js")
 const API = require("./class/API.cjs")
 const ToyNoises = require("./class/sound/ToyNoises.cjs")
-require("./importAssetsHack.js")
+const NullNoises = require("./class/sound/NullNoises.cjs")
 const PostQueue = require("./class/PostQueue.cjs")
+const MainMenuModal = require("./class/modal/MainMenuModal.cjs")
+const ConfigurationModal = require("./class/modal/ConfigurationModal.cjs")
 const SinglePostInterface = require("./class/interface/SinglePostInterface.cjs")
+
+const configurationModal = new ConfigurationModal()
+let toyNoises = new NullNoises()
+if (configurationModal.getSetting("noises") == "on") toyNoises = new ToyNoises()
+configurationModal.toyNoises = toyNoises
 const api = new API()
 const postQueue = new PostQueue(api)
-new SinglePostInterface(postQueue, new ToyNoises())
+const singlePostInterface = new SinglePostInterface(postQueue, toyNoises)
+const mainMenuModal = new MainMenuModal(toyNoises)
+mainMenuModal.addConfigurationButton(configurationModal)
+mainMenuModal.addInterfaceButton(singlePostInterface, "Single post labeling")
+mainMenuModal.open()
