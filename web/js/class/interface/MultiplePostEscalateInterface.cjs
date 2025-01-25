@@ -73,7 +73,16 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		const backQueueLimit = parseInt(this.configurationModal.getSetting("backQueueLimit"))
 		// trim back queue
 		if (this.postQueue.backQueue.length > backQueueLimit) {
-			this.postQueue.backQueue.splice(0, this.postQueue.backQueue.length - backQueueLimit)
+			const removed = this.postQueue.backQueue.splice(0, this.postQueue.backQueue.length - backQueueLimit)
+			removed.forEach(removedPost => {
+				if (removedPost.renderImages[0].videoCache) {
+					removedPost.renderImages[0].videoCache.remove()
+					// Destroy HLS context
+					if (removedPost.renderImages[0].hls) {
+						removedPost.renderImages[0].hls.destroy()
+					}
+				}
+			})
 		}
 		// clear container
 		this.container.innerHTML = ""
