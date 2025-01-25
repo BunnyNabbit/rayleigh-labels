@@ -23,6 +23,12 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.container.style.display = "grid"
 		this.container.style.height = "100vh"
 		this.container.style.width = "100vw"
+		this.labelValues = new Set()
+		this.postQueue.api.getLabels().then(labels => {
+			labels.forEach(label => {
+				this.labelValues.add(label.value)
+			})
+		})
 	}
 	updatePositionIndicator() {
 		const text = `${this.postQueue.queue.length}`
@@ -90,6 +96,15 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				element.classList.add("grid-item")
 				element.style.gridColumn = x + 1
 				element.style.gridRow = y + 1
+				post.labels.forEach(label => {
+					if (this.labelValues.has(label.val)) {
+						// highlight element
+						element.style.borderColor = "red"
+						element.style.borderWidth = "5px"
+						element.style.borderStyle = "dotted"
+						element.style.zIndex = "1"
+					}
+				})
 				postMediaMap.set(element, post)
 				if (media.playlist) { // video
 					if (!media.videoCache) this.preloadMedia(media)
