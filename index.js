@@ -65,13 +65,13 @@ class AgentP {
 
 		await this.emitModerationEvent(uri, event)
 	}
-	queryStatuses(cursor) {
+	queryStatuses(cursor, queue) {
 		const body = {
 			limit: 100,
 			includeMuted: true,
 			sortField: "lastReportedAt",
 			sortDirection: "desc",
-			reviewState: "tools.ozone.moderation.defs#reviewOpen"
+			reviewState: queue
 		}
 		if (cursor) body.cursor = cursor
 		return this.agent.tools.ozone.moderation.queryStatuses(body, {
@@ -169,8 +169,12 @@ app.post('/hydrateposts', async (req, res) => {
 
 })
 
-app.get('/getreports/', async (req, res) => {
+app.get('/getreports/:queue', async (req, res) => {
 	await agent.ready
+	let queue = "tools.ozone.moderation.defs#reviewOpen"
+	if (req.params.queue == "escalated") {
+		queue = "tools.ozone.moderation.defs#reviewEscalated"
+	}
 	let reports = []
 	function respond() {
 		res.json(reports)
@@ -181,7 +185,7 @@ app.get('/getreports/', async (req, res) => {
 	let cursor = null
 	for (let i = 0; i <= queuePages; i++) {
 		try {
-			const statusResponse = await agent.queryStatuses(cursor)
+			const statusResponse = await agent.queryStatuses(cursor, queue)
 			cursor = statusResponse.data.cursor
 			reports = reports.concat(statusResponse.data.subjectStatuses)
 			if (cursor) {

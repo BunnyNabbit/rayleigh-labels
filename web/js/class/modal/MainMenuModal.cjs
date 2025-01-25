@@ -1,4 +1,6 @@
 const BaseMenuModal = require("./BaseMenuModal.cjs")
+const API = require("../../class/API.cjs")
+const PostQueue = require("../../class/PostQueue.cjs")
 class MainMenuModal extends BaseMenuModal {
 	constructor(toyNoises) {
 		super(true, toyNoises)
@@ -16,11 +18,13 @@ class MainMenuModal extends BaseMenuModal {
 		this.modal.appendChild(button)
 	}
 
-	addInterfaceButton(rInterface, name) {
-		this.interface = rInterface
+	addInterfaceButton(interfaceClass, name) {
 		const button = document.createElement("button")
 		button.textContent = name
 		button.onclick = () => {
+			const api = new API()
+			const postQueue = new PostQueue(api, this.configurationModal)
+			const rInterface = new interfaceClass(postQueue, this.toyNoises)
 			this.close()
 			rInterface.open()
 		}

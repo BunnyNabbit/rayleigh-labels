@@ -206,6 +206,7 @@ class ConfigurationModal extends BaseMenuModal {
 		this.addSetting(new TextSetting("priorityTags", "Prioritize post subject tags (Comma separated)", "priority"))
 		this.addSetting(new NumberRangeSetting("gridX", "Escalation grid X", 3, 1, 8))
 		this.addSetting(new NumberRangeSetting("gridY", "Escalation grid Y", 3, 1, 8))
+		this.addSetting(new SelectSetting("queue", "Queue", "open", { list: ["open", "escalated"] }))
 		this.addSetting(new Text("Some settings may require a page refresh to apply."))
 		// Restrained Rayleigh. Use localStorage.setItem(`rayleighSetting:restraints`, "true") to enable
 		if (localStorage.getItem(`${Setting.keyPrefix}restraints`) == "true") { // a bit hacky, since a setting cannot be accessed if it doesn't exist

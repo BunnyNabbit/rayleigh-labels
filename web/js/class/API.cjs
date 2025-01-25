@@ -15,15 +15,13 @@ class API {
 		}
 		return await response.json()
 	}
-	getReports() {
-		return fetch("/getreports").then(response => {
-			if (!response.ok) {
-				throw new Error("HTTP error " + response.status)
-			}
-			return response.json()
-		}).then(json => {
-			return json
-		})
+	async getReports(queue) {
+		const response = await fetch(`/getreports/${queue}`)
+		if (!response.ok) {
+			throw new Error("HTTP error " + response.status)
+		}
+		const json = await response.json()
+		return json
 	}
 	async label(data) {
 		const response = await fetch("/addlabel", {

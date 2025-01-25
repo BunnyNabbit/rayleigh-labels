@@ -1,8 +1,10 @@
 const ToyNoises = require("../sound/ToyNoises.cjs")
 const InputControls = require("../InputControls.cjs")
+const GenericInterface = require("./GenericInterface.cjs")
 
-class SinglePostInterface {
+class SinglePostInterface extends GenericInterface {
 	constructor(postQueue, toyNoises) {
+		super(postQueue, toyNoises, true)
 		this.postQueue = postQueue
 		this.configurationModal = postQueue.configurationModal
 		this.postQueue.interface = this

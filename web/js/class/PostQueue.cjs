@@ -24,7 +24,8 @@ class PostQueue {
 	}
 
 	async populateQueue() {
-		const response = await this.api.getReports()
+		const queueType = this.configurationModal.getSetting("queue")
+		const response = await this.api.getReports(queueType)
 		const tagUriCache = new Set()
 		const tagList = this.configurationModal.getSetting("priorityTags").split(",")
 		response.forEach(report => {
