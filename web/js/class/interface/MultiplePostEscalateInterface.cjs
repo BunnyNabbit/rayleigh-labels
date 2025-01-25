@@ -159,10 +159,11 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			this.overflowPost = null
 		}
 		this.overflowMedia = []
-		set.forEach((post) => {
-			if (this.overflowPost) return
+		for (let i = 0; i < set.length; i++) {
+			if (this.overflowPost) break
+			const post = set[i]
 			addPost(post.renderImages, post)
-		})
+		}
 		// set current posts
 		this.currentPosts = Array.from(renderedPosts)
 		// remove current posts from queue
