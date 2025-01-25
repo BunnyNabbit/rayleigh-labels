@@ -17,8 +17,6 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.control.on("previous", () => {
 			this.previous()
 		})
-		this.container.style.gridTemplateColumns = `repeat(${MultiplePostEscalateInterface.gridX}, 1fr)`
-		this.container.style.gridTemplateRows = `repeat(${MultiplePostEscalateInterface.gridY}, 1fr)`
 		this.container.style.gap = "1px"
 		this.container.style.display = "grid"
 		this.container.style.height = "100vh"
@@ -35,6 +33,11 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.positionIndicatorElement.innerText = text
 	}
 	open() {
+		this.gridX = parseInt(this.configurationModal.getSetting("gridX"))
+		this.gridY = parseInt(this.configurationModal.getSetting("gridY"))
+		this.setCount = this.gridX * this.gridY
+		this.container.style.gridTemplateColumns = `repeat(${this.gridX}, 1fr)`
+		this.container.style.gridTemplateRows = `repeat(${this.gridY}, 1fr)`
 		this.postQueue.getSet()
 	}
 	previous() { // Gets posts from backQueue and displays them
@@ -93,14 +96,15 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			if (post.escalated) return
 			media.forEach(media => {
 				// check if overflowing
-				if (index >= MultiplePostEscalateInterface.setCount) {
+				if (index >= this.setCount) {
 					this.overflowPost = post
 					this.overflowMedia.push(media)
 					return
 				}
 				renderedPosts.add(post)
-				const x = index % MultiplePostEscalateInterface.gridX
-				const y = Math.floor(index / MultiplePostEscalateInterface.gridX)
+
+				const x = index % this.gridX
+				const y = Math.floor(index / this.gridX)
 				const element = document.createElement("div")
 				element.classList.add("grid-item")
 				element.style.gridColumn = x + 1
@@ -174,9 +178,6 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			this.postQueue.queue.splice(this.postQueue.queue.indexOf(post), 1)
 		})
 	}
-	static gridX = 3
-	static gridY = 3
-	static setCount = MultiplePostEscalateInterface.gridX * MultiplePostEscalateInterface.gridY
 }
 
 module.exports = MultiplePostEscalateInterface
