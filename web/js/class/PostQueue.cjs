@@ -97,7 +97,14 @@ class PostQueue {
 	}
 	static funnyEmptyQueueMessages = [
 		"Incredible! You're a real bridge raiser!",
-		"YOU'RE WINNER"
+		"YOU'RE WINNER !",
+		"2021 appliances: *Break within two years.",
+		"Unfortunately, the queue is empty.",
+		"Congratulations! You've reached the end of the internet!",
+		"Wow! You're really good at this!",
+		"Good job! You've done it!",
+		"A WINNER IS YOU.",
+		"glad you did it babe"
 	]
 }
 
