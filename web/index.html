@@ -85,11 +85,15 @@
 		.hidden {
 			display: none;
 		}
+
+		.grid-item {
+			min-height: fit-content
+		}
 	</style>
 </head>
 
 <body>
-	<div id="singlePostInterface">
+	<div id="singlePostInterface" class="hidden">
 		<div id="subjectDisplay">
 			<img id="currentSubject" class="fullscreen-image" src="/web/placeholder/aon-drone.png">
 			<video controls autoplay loop muted id="currentVideoSubject" class="fullscreen-image hidden"></video>

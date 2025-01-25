@@ -50,6 +50,14 @@ class AgentP {
 		await this.emitModerationEvent(uri, event)
 	}
 
+	async escalate(uri) {
+		const event = {
+			$type: "tools.ozone.moderation.defs#modEventEscalate",
+		}
+
+		await this.emitModerationEvent(uri, event)
+	}
+
 	async acknowledgeReport(uri) {
 		const event = {
 			$type: "tools.ozone.moderation.defs#modEventAcknowledge",
@@ -117,6 +125,26 @@ app.post('/addlabel/', async (req, res) => {
 		}
 	}
 })
+
+app.post('/escalate', async (req, res) => {
+	await agent.ready
+	for (let i = 0; i <= maxRetries; i++) {
+		try {
+			await agent.escalate(req.body.uri)
+			res.json({ message: "ok" })
+			break
+		} catch (error) {
+			if (i === maxRetries) {
+				console.error(error)
+				res.status(500).json({ message: "Failed" })
+			} else {
+				console.warn(`Attempt ${i + 1} failed, retrying...`)
+				await new Promise(resolve => setTimeout(resolve, 1000))
+			}
+		}
+	}
+})
+
 
 const maxRetries = 5
 const queuePages = 30

@@ -61,6 +61,11 @@ class PostQueue {
 
 	}
 
+	escalatePost(post) {
+		this.api.escalate(post.uri)
+		post.escalated = true
+	}
+
 	labelPost(post, add, negate) {
 		this.api.label({
 			add, negate, uri: post.uri

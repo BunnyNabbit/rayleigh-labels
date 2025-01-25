@@ -39,6 +39,20 @@ class API {
 		}
 		return await response.json()
 	}
+	async escalate(uri) {
+		const response = await fetch("/escalate", {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			method: "POST",
+			body: JSON.stringify({ uri })
+		})
+		if (!response.ok) {
+			throw new Error("HTTP error " + response.status)
+		}
+		return await response.json()
+	}
 	getLabels() {
 		return new Promise(resolve => {
 			resolve(require("../../labels.json"))

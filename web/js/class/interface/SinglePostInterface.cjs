@@ -1,6 +1,5 @@
 const ToyNoises = require("../sound/ToyNoises.cjs")
 const InputControls = require("../InputControls.cjs")
-const Hls = require("hls.js")
 
 class SinglePostInterface {
 	constructor(postQueue, toyNoises) {
@@ -82,6 +81,7 @@ class SinglePostInterface {
 		const media = this.currentPost.renderImages[this.currentPosition]
 		if (media.playlist) {
 			if (!media.videoCache) this.preloadMedia(media)
+			media.videoCache.classList.add("fullscreen-image")
 			const video = media.videoCache
 			this.currentSubjectElement.classList.add("hidden")
 			video.classList.remove("hidden")
@@ -102,26 +102,6 @@ class SinglePostInterface {
 
 		this.updatePositionIndicator(this.currentPost)
 	}
-	preloadMedia(media) {
-		if (media.fullsize) {
-			const preloadImage = new Image()
-			preloadImage.src = media.fullsize
-		}
-		if (media.playlist) {
-			const video = document.createElement("video")
-			video.classList.add("hidden")
-			video.autoplay = false
-			video.loop = true
-			video.muted = true
-			video.classList.add("fullscreen-image")
-			const preloadHls = new Hls()
-			preloadHls.loadSource(media.playlist)
-			preloadHls.attachMedia(video)
-			this.subjectDisplayDiv.appendChild(video)
-			media.videoCache = video
-			media.hls = preloadHls
-		}
-	}
 	updateLabels(post) {
 		this.labelElements.forEach(labelElement => {
 			labelElement.checked = false
@@ -137,6 +117,7 @@ class SinglePostInterface {
 		if (hasLabel) this.toyNoises.playSound(ToyNoises.sounds.hasLabel)
 	}
 	open() {
+		document.getElementById("singlePostInterface").classList.remove("hidden")
 		this.postQueue.getSet()
 	}
 	previous() { // Gets one post from backQueue and displays it
