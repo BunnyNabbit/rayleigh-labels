@@ -13,7 +13,7 @@ let toyNoises = new NullNoises()
 if (configurationModal.getSetting("noises") == true) toyNoises = new ToyNoises()
 configurationModal.toyNoises = toyNoises
 const api = new API()
-const postQueue = new PostQueue(api)
+const postQueue = new PostQueue(api, configurationModal)
 const singlePostInterface = new SinglePostInterface(postQueue, toyNoises)
 const mainMenuModal = new MainMenuModal(toyNoises)
 mainMenuModal.addConfigurationButton(configurationModal)

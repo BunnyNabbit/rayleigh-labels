@@ -5,6 +5,7 @@ const Hls = require("hls.js")
 class SinglePostInterface {
 	constructor(postQueue, toyNoises) {
 		this.postQueue = postQueue
+		this.configurationModal = postQueue.configurationModal
 		this.postQueue.interface = this
 		this.toyNoises = toyNoises
 		this.currentPosition = 0
@@ -47,15 +48,15 @@ class SinglePostInterface {
 			this.switchPostImage(direction)
 		})
 		this.control.on("next", () => {
-			this.postQueue.next()
+			this.next()
 		})
 		this.control.on("previous", () => {
-			this.postQueue.previous()
+			this.previous()
 		})
 	}
 	displayPost(post) {
-		this.postQueue.viewedAll = false
-		this.postQueue.currentPost = post
+		this.viewedAll = false
+		this.currentPost = post
 		this.currentPosition = 0
 		this.switchPostImage()
 		this.updateLabels(post)
@@ -65,12 +66,12 @@ class SinglePostInterface {
 		this.positionIndicatorElement.innerText = text
 	}
 	switchPostImage(direction = InputControls.DIRECTION.STILL) {
-		if (!this.postQueue.currentPost) return
-		const max = this.postQueue.currentPost.renderImages.length - 1
+		if (!this.currentPost) return
+		const max = this.currentPost.renderImages.length - 1
 		const newPosition = this.currentPosition + direction
 		this.currentPosition = Math.max(Math.min(newPosition, max), 0)
 		if (this.currentPosition == max) {
-			this.postQueue.viewedAll = true
+			this.viewedAll = true
 			this.toyNoises.playSound(ToyNoises.sounds.lastInPost)
 		}
 		if (this.currentVideoSubjectElement) {
@@ -78,7 +79,7 @@ class SinglePostInterface {
 			this.currentVideoSubjectElement.pause()
 			this.currentVideoSubjectElement = null
 		}
-		const media = this.postQueue.currentPost.renderImages[this.currentPosition]
+		const media = this.currentPost.renderImages[this.currentPosition]
 		if (media.playlist) {
 			if (!media.videoCache) this.preloadMedia(media)
 			const video = media.videoCache
@@ -99,7 +100,7 @@ class SinglePostInterface {
 			this.currentSubjectElement.alt = media.alt
 		}
 
-		this.updatePositionIndicator(this.postQueue.currentPost)
+		this.updatePositionIndicator(this.currentPost)
 	}
 	preloadMedia(media) {
 		if (media.fullsize) {
@@ -137,6 +138,54 @@ class SinglePostInterface {
 	}
 	open() {
 		this.postQueue.getSet()
+	}
+	previous() { // Gets one post from backQueue and displays it
+		if (!this.currentPost) return
+		if (!this.postQueue.backQueue.length) return
+		const post = this.postQueue.backQueue.pop()
+		this.postQueue.queue.unshift(post)
+		this.displayPost(post)
+	}
+	next() { // Gets one post from queue and displays it
+		if (!this.currentPost) return
+		if (!this.viewedAll) return this.switchPostImage(InputControls.DIRECTION.RIGHT)
+		const post = this.postQueue.queue.shift()
+		this.postQueue.backQueue.push(post)
+		if (this.postQueue.backQueue.length > parseInt(this.configurationModal.getSetting("backQueueLimit"))) {
+			const removedPost = this.postQueue.backQueue.shift()
+			if (removedPost.renderImages[0].videoCache) {
+				removedPost.renderImages[0].videoCache.remove()
+				// Destroy HLS context
+				if (removedPost.renderImages[0].hls) {
+					removedPost.renderImages[0].hls.destroy()
+				}
+			}
+		}
+		const postLabels = this.currentPost.labels
+		const currentLabelValues = this.labelElements.map(element => { return { name: element.id, checked: element.checked } })
+		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
+		const negate = currentLabelValues.filter(currentValue => currentValue.checked == false && postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
+		this.postQueue.labelPost(post, add, negate)
+		this.currentPost.labels = this.labelElements.filter(element => element.checked == true).map(element => { return { val: element.id } })
+		if (this.postQueue.queue[0]) {
+			this.displayPost(this.postQueue.queue[0])
+			// preload next posts
+			for (let i = 1; i < parseInt(this.configurationModal.getSetting("queuePreload")); i++) {
+				if (this.postQueue.queue[i] && !this.postQueue.queue[i].preloaded) {
+					this.postQueue.queue[i].preloaded = true
+					this.postQueue.queue[i].renderImages.forEach(media => {
+						this.preloadMedia(media)
+					})
+				}
+			}
+		} else {
+			this.currentPost = null
+			this.currentSubjectElement.src = this.placeholderImageUrl
+			this.postQueue.getSet()
+		}
+	}
+	displaySet() { // Displays the current post in queue
+		this.displayPost(this.postQueue.queue[0])
 	}
 }
 

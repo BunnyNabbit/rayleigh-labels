@@ -197,11 +197,13 @@ class ConfigurationModal extends BaseMenuModal {
 		// Settings
 		this.addSetting(new Header("Configuration", 2))
 		this.addSetting(new NumberRangeSetting("queuePreload", "Posts to preload", 50, 1, 100))
+		this.addSetting(new NumberRangeSetting("backQueueLimit", "Back queue size", 50, 1, 1000))
 		this.addSetting(new BooleanSetting("noises", "Enable noises", true, { requiresReload: true }))
 		this.addSetting(new SelectSetting("theme", "Theme", "Rayleigh", { list: ["Rayleigh", "Ozone"] }))
 		this.addSetting(new BooleanSetting("autoplay", "Autoplay videos", true))
 		this.addSetting(new BooleanSetting("unmuteVideos", "Unmute videos", false))
 		this.addSetting(new TextSetting("blurLabels", "Blur labels (Comma separated)", "!hide,!warn"))
+		this.addSetting(new TextSetting("priorityTags", "Prioritize post subject tags (Comma separated)", "priority"))
 		this.addSetting(new Text("Some settings may require a page refresh to apply."))
 		// Restrained Rayleigh. Use localStorage.setItem(`rayleighSetting:restraints`, "true") to enable
 		if (localStorage.getItem(`${Setting.keyPrefix}restraints`) == "true") { // a bit hacky, since a setting cannot be accessed if it doesn't exist

@@ -1,21 +1,19 @@
 const API = require("./API.cjs")
 const { randomIntFromInterval, chunkArray } = require("../utils.cjs")
-const InputControls = require("./InputControls.cjs")
 
 class PostQueue {
-	constructor(api) {
+	constructor(api, configurationModal) {
 		this.api = api
+		this.configurationModal = configurationModal
 		this.queue = []
 		this.backQueue = []
-		this.currentPost = null
-		this.viewedAll = false
 		this.interface = null
 	}
 	// Get the next set of posts
 	getSet() {
 		this.populateQueue().then(() => {
 			if (this.queue[0]) {
-				this.interface.displayPost(this.queue[0])
+				this.interface.displaySet()
 			} else {
 				alert(PostQueue.funnyEmptyQueueMessages[randomIntFromInterval(0, PostQueue.funnyEmptyQueueMessages.length - 1)])
 			}
@@ -28,8 +26,13 @@ class PostQueue {
 	async populateQueue() {
 		const response = await this.api.getReports()
 		const tagUriCache = new Set()
+		const tagList = this.configurationModal.getSetting("priorityTags").split(",")
 		response.forEach(report => {
-			if (report.tags.some(tag => tag.startsWith("det:"))) tagUriCache.add(report.subject.uri)
+			report.tags.forEach(tag => {
+				if (tagList.includes(tag)) {
+					tagUriCache.add(report.subject.uri)
+				}
+			})
 		})
 		let tmp = []
 		const uris = response.map(report => report.subject.uri).filter(element => element)
@@ -52,56 +55,18 @@ class PostQueue {
 		Promise.allSettled(promises).then(() => {
 			this.queue = this.queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
 				.sort((a, b) => b.likeCount - a.likeCount)
+				.sort((a, b) => b.tagged - a.tagged)
 		})
 		return Promise.allSettled(promises)
+
 	}
 
-	next() {
-		if (!this.currentPost) return
-		if (!this.viewedAll) return this.interface.switchPostImage(InputControls.DIRECTION.RIGHT)
-		const post = this.queue.shift()
-		this.backQueue.push(post)
-		if (this.backQueue.length > PostQueue.backQueueLimit) {
-			const removedPost = this.backQueue.shift()
-			if (removedPost.renderImages[0].videoCache) {
-				removedPost.renderImages[0].videoCache.remove()
-				// Destroy HLS context
-				if (removedPost.renderImages[0].hls) {
-					removedPost.renderImages[0].hls.destroy()
-				}
-			}
-		}
-		const postLabels = this.currentPost.labels
-		const currentLabelValues = this.interface.labelElements.map(element => { return { name: element.id, checked: element.checked } })
-		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
-		const negate = currentLabelValues.filter(currentValue => currentValue.checked == false && postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
+	labelPost(post, add, negate) {
 		this.api.label({
-			add, negate, uri: this.currentPost.uri
+			add, negate, uri: post.uri
 		})
-		this.currentPost.labels = this.interface.labelElements.filter(element => element.checked == true).map(element => { return { val: element.id } })
-		if (this.queue[0]) {
-			this.interface.displayPost(this.queue[0])
-			// preload next posts
-			for (let i = 1; i < 6; i++) {
-				if (this.queue[i] && !this.queue[i].preloaded) {
-					this.queue[i].preloaded = true
-					this.queue[i].renderImages.forEach(media => {
-						this.interface.preloadMedia(media)
-					})
-				}
-			}
-		} else {
-			this.currentPost = null
-			this.interface.currentSubjectElement.src = this.interface.placeholderImageUrl
-			this.getSet()
-		}
-	}
-	previous() {
-		if (!this.currentPost) return
-		if (!this.backQueue.length) return
-		const post = this.backQueue.pop()
-		this.queue.unshift(post)
-		this.interface.displayPost(post)
+		post.labels = post.labels.filter(label => !negate.includes(label.val))
+		add.forEach(label => post.labels.push({ val: label }))
 	}
 
 	static filterTransformEmbedTypes(posts) {
@@ -134,7 +99,6 @@ class PostQueue {
 		"Incredible! You're a real bridge raiser!",
 		"YOU'RE WINNER"
 	]
-	static backQueueLimit = 50
 }
 
 module.exports = PostQueue
