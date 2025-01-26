@@ -18,10 +18,12 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.control.on("previous", () => {
 			this.previous()
 		})
-		this.container.style.gap = "1px"
-		this.container.style.display = "grid"
-		this.container.style.height = "100vh"
-		this.container.style.width = "100vw"
+      this.postContainer = document.createElement("div")
+		this.postContainer.style.gap = "1px"
+		this.postContainer.style.display = "grid"
+		this.postContainer.style.height = "100vh"
+		this.postContainer.style.width = "100vw"
+		this.container.appendChild(this.postContainer)
 		this.labelValues = new Set()
 		this.postQueue.api.getLabels().then(labels => {
 			labels.forEach(label => {
@@ -37,8 +39,8 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.gridX = parseInt(this.configurationModal.getSetting("gridX"))
 		this.gridY = parseInt(this.configurationModal.getSetting("gridY"))
 		this.setCount = this.gridX * this.gridY
-		this.container.style.gridTemplateColumns = `repeat(${this.gridX}, 1fr)`
-		this.container.style.gridTemplateRows = `repeat(${this.gridY}, 1fr)`
+		this.postContainer.style.gridTemplateColumns = `repeat(${this.gridX}, 1fr)`
+		this.postContainer.style.gridTemplateRows = `repeat(${this.gridY}, 1fr)`
 		this.postQueue.getSet()
 	}
 	previous() { // Gets posts from backQueue and displays them
@@ -57,6 +59,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		remove.forEach(post => {
 			this.postQueue.backQueue.splice(this.postQueue.backQueue.indexOf(post), 1)
 		})
+		this.updatePositionIndicator()
 	}
 	next() { // Gets posts from queue and displays them
 		if (this.postQueue.queue[0]) {
@@ -106,13 +109,15 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			this.displaySet() // TODO: loading placeholder. i'll call displaySet since it'll display black for zhe time being
 			this.postQueue.getSet()
 		}
+		this.updatePositionIndicator()
 	}
 	displaySet() { // Displays posts from queue
 		this.displayPosts(this.postQueue.queue)
+		this.updatePositionIndicator()
 	}
 	displayPosts(set) {
 		// clear container
-		this.container.innerHTML = ""
+		this.postContainer.innerHTML = ""
 		let index = 0
 		const renderedPosts = new Set()
 		const postMediaMap = new Map()
@@ -181,7 +186,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 						if (ozherPost == post) element.remove()
 					})
 				})
-				this.container.appendChild(element)
+				this.postContainer.appendChild(element)
 				index++
 			})
 		}
