@@ -60,6 +60,13 @@ class MultiplePostEscalateInterface extends GenericInterface {
 	next() { // Gets posts from queue and displays them
 		if (this.postQueue.queue[0]) {
 			this.postQueue.backQueue.unshift(...this.currentPosts) // add current posts to back queue
+			// acknowledge current posts which have not been escalated
+			this.currentPosts.forEach(post => {
+				if (!post.escalated && !post.acknowledged) {
+					this.postQueue.labelPost(post, [], [])
+					post.acknowledged = true
+				}
+			})
 			this.displaySet()
 			// preload next posts
 			for (let i = 1; i < parseInt(this.configurationModal.getSetting("queuePreload")); i++) {
@@ -103,13 +110,6 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.displayPosts(this.postQueue.queue)
 	}
 	displayPosts(set) {
-		// acknowledge current posts which have not been escalated
-		this.currentPosts.forEach(post => {
-			if (!post.escalated && !post.acknowledged) {
-				this.postQueue.labelPost(post, [], [])
-				post.acknowledged = true
-			}
-		})
 		// clear container
 		this.container.innerHTML = ""
 		let index = 0
