@@ -53,6 +53,9 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				remove.push(post)
 			}
 		}
+		remove.forEach(post => {
+			this.postQueue.backQueue.splice(this.postQueue.backQueue.indexOf(post), 1)
+		})
 	}
 	next() { // Gets posts from queue and displays them
 		if (this.postQueue.queue[0]) {
