@@ -1,6 +1,7 @@
 // const ToyNoises = require("../sound/ToyNoises.cjs")
 const InputControls = require("../InputControls.cjs")
 const GenericInterface = require("./GenericInterface.cjs")
+const ToyNoises = require("../sound/ToyNoises.cjs")
 
 // Displays media from posts in a grid. Click to escalate a post, removing it from queue and view.
 class MultiplePostEscalateInterface extends GenericInterface {
@@ -174,6 +175,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				}
 				element.addEventListener("click", () => {
 					this.postQueue.escalatePost(post)
+					this.toyNoises.playSound(ToyNoises.sounds.escalate)
 					// hide all images from post
 					postMediaMap.forEach((ozherPost, element) => {
 						if (ozherPost == post) element.remove()
