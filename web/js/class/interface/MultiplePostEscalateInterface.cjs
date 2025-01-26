@@ -42,10 +42,21 @@ class MultiplePostEscalateInterface extends GenericInterface {
 	}
 	previous() { // Gets posts from backQueue and displays them
 		if (!this.postQueue.backQueue.length) return
+		// move current posts to queue
+		this.postQueue.queue.unshift(...this.currentPosts)
+		// display posts from back queue
 		this.displayPosts(this.postQueue.backQueue)
+		// remove current posts from back queue
+		let remove = []
+		for (const post of this.postQueue.backQueue) {
+			if (this.currentPosts.includes(post)) {
+				remove.push(post)
+			}
+		}
 	}
 	next() { // Gets posts from queue and displays them
 		if (this.postQueue.queue[0]) {
+			this.postQueue.backQueue.unshift(...this.currentPosts) // add current posts to back queue
 			this.displaySet()
 			// preload next posts
 			for (let i = 1; i < parseInt(this.configurationModal.getSetting("queuePreload")); i++) {
@@ -56,6 +67,30 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					})
 				}
 			}
+			// trim back queue
+			const backQueueLimit = parseInt(this.configurationModal.getSetting("backQueueLimit"))
+			if (this.postQueue.backQueue.length > backQueueLimit) {
+				const removed = this.postQueue.backQueue.splice(backQueueLimit)
+				removed.forEach(removedPost => {
+					if (removedPost.renderImages[0].videoCache) {
+						removedPost.renderImages[0].videoCache.remove()
+						// Destroy HLS context
+						if (removedPost.renderImages[0].hls) {
+							removedPost.renderImages[0].hls.destroy()
+						}
+					}
+				})
+			}
+			// remove current posts from queue
+			let remove = []
+			for (const post of this.postQueue.queue) {
+				if (this.currentPosts.includes(post)) {
+					remove.push(post)
+				}
+			}
+			remove.forEach(post => {
+				this.postQueue.queue.splice(this.postQueue.queue.indexOf(post), 1)
+			})
 		} else {
 			this.displaySet() // TODO: loading placeholder. i'll call displaySet since it'll display black for zhe time being
 			this.postQueue.getSet()
@@ -72,28 +107,16 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				post.acknowledged = true
 			}
 		})
-		this.postQueue.backQueue.push(...this.currentPosts) // add current posts to back queue
-		const backQueueLimit = parseInt(this.configurationModal.getSetting("backQueueLimit"))
-		// trim back queue
-		if (this.postQueue.backQueue.length > backQueueLimit) {
-			const removed = this.postQueue.backQueue.splice(0, this.postQueue.backQueue.length - backQueueLimit)
-			removed.forEach(removedPost => {
-				if (removedPost.renderImages[0].videoCache) {
-					removedPost.renderImages[0].videoCache.remove()
-					// Destroy HLS context
-					if (removedPost.renderImages[0].hls) {
-						removedPost.renderImages[0].hls.destroy()
-					}
-				}
-			})
-		}
 		// clear container
 		this.container.innerHTML = ""
 		let index = 0
 		const renderedPosts = new Set()
 		const postMediaMap = new Map()
 		const addPost = (media, post) => {
-			if (post.escalated) return
+			if (post.escalated) {
+				renderedPosts.add(post) // idk? seems to fix it, but for what reason?
+				return
+			}
 			media.forEach(media => {
 				// check if overflowing
 				if (index >= this.setCount) {
@@ -123,7 +146,11 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					if (!media.videoCache) this.preloadMedia(media)
 					const video = media.videoCache
 					video.classList.remove("hidden")
-					video.play()
+					try {
+						video.play()
+					} catch (error) {
+						console.warn(error)
+					}
 					video.playbackRate = 2
 					video.controls = true
 					if (media.alt) {
@@ -146,7 +173,6 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					this.postQueue.escalatePost(post)
 					// hide all images from post
 					postMediaMap.forEach((ozherPost, element) => {
-						console.log(ozherPost, element)
 						if (ozherPost == post) element.remove()
 					})
 				})
@@ -166,18 +192,6 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		}
 		// set current posts
 		this.currentPosts = Array.from(renderedPosts)
-		// remove current posts from queue
-		let remove = []
-		for (const post of this.postQueue.queue) {
-			if (this.currentPosts.includes(post)) {
-				remove.push(post)
-			} else {
-				break
-			}
-		}
-		remove.forEach(post => {
-			this.postQueue.queue.splice(this.postQueue.queue.indexOf(post), 1)
-		})
 	}
 }
 
