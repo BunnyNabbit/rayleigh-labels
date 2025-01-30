@@ -178,7 +178,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					image.style.height = "100%"
 					element.appendChild(image)
 				}
-				element.addEventListener("click", () => {
+				element.addEventListener("pointerup", () => {
 					this.postQueue.escalatePost(post)
 					this.toyNoises.playSound(ToyNoises.sounds.escalate)
 					// hide all images from post
