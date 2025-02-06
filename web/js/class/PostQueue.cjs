@@ -109,8 +109,9 @@ class PostQueue {
 		"Congratulations! You've reached the end of the internet!",
 		"Wow! You're really good at this!",
 		"Good job! You've done it!",
-		"A WINNER IS YOU.",
-		"glad you did it babe"
+		"A WINNER IS YOU",
+		"glad you did it babe",
+		"i've won...... but at what cost?"
 	]
 }
 
