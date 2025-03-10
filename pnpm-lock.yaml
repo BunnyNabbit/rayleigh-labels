@@ -11,6 +11,9 @@ importers:
       '@atproto/api':
         specifier: ^0.13.35
         version: 0.13.35
+      events:
+        specifier: ^3.3.0
+        version: 3.3.0
       express:
         specifier: ^4.21.2
         version: 4.21.2
