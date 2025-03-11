@@ -8,9 +8,9 @@ Rayleigh is not a replacement labeling service. It still requires a labeling ser
 ## Setup
 Node.js should be installed prior to following these setup instructions.
 1. In the project directory, install dependencies with `npm i`.
-2. Copy `/agentKeys-example.json` to `/agentKeys.json` and copy `/web/labels-example.json` to `/web/labels.json`. You will then edit the new files with relevant information.
+2. Copy `/example.env` to `/.env`. You will then edit the new files with relevant information.
 3. Run `npm run build` to build the web interface. Or use `npm run watch` to build on changed files. 
-4. Run with `npm run start`. By default, the moderation interface can be accessed at localhost:3213.
+4. Run with `npm run start`. By default, the moderation interface can be accessed at port 3213. You may need to either deploy Rayleigh or use tunneling software to login.
 
 ## Usage
 The interface will emit events back to the labeling service when a post is acknowledged/labeled. Set a post's labels from the buttons on the top left area of the interface
