@@ -8,6 +8,7 @@ class ClientAPI {
 	constructor(agent, labelerDid) {
 		this.agent = agent
 		this.labelerDid = labelerDid
+		this.agent.addLabeler(labelerDid)
 	}
 	async hydratePosts(uris) {
 		for (let i = 0; i <= ClientAPI.maxRetries; i++) {
