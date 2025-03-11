@@ -18,17 +18,16 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.control.on("previous", () => {
 			this.previous()
 		})
-      this.postContainer = document.createElement("div")
+		this.postContainer = document.createElement("div")
 		this.postContainer.style.gap = "1px"
 		this.postContainer.style.display = "grid"
 		this.postContainer.style.height = "100vh"
 		this.postContainer.style.width = "100vw"
 		this.container.appendChild(this.postContainer)
 		this.labelValues = new Set()
-		this.postQueue.api.getLabels().then(labels => {
-			labels.forEach(label => {
-				this.labelValues.add(label.value)
-			})
+		const labels = this.postQueue.getLabels()
+		labels.forEach(label => {
+			this.labelValues.add(label.slug)
 		})
 	}
 	updatePositionIndicator() {

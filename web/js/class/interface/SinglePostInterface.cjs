@@ -13,34 +13,33 @@ class SinglePostInterface extends GenericInterface {
 		this.currentVideoSubjectElement = null
 		// populate labels
 		this.labelElements = []
-		this.postQueue.api.getLabels().then(labels => {
-			this.currentLabelsElement.innerHTML = ""
-			labels.forEach(label => {
-				const inputElement = document.createElement('input')
-				inputElement.type = 'checkbox'
-				inputElement.id = label.value
+		const labels = this.postQueue.getLabels()
+		this.currentLabelsElement = document.getElementById("currentLabels")
+		this.currentLabelsElement.innerHTML = ""
+		labels.forEach(label => {
+			const inputElement = document.createElement('input')
+			inputElement.type = 'checkbox'
+			inputElement.id = label.slug
 
-				const labelElement = document.createElement('label')
-				labelElement.htmlFor = label.value
-				labelElement.textContent = label.readableName
-				labelElement.style.backgroundColor = label.backgroundColor
-				labelElement.style.color = label.textColor
+			const labelElement = document.createElement('label')
+			labelElement.htmlFor = label.slug
+			labelElement.textContent = label.readableName
+			labelElement.style.backgroundColor = label.backgroundColor
+			labelElement.style.color = label.textColor
 
-				// Optional: Add alt key functionality
-				if (label.altKey) {
-					inputElement.accessKey = label.altKey // Use accessKey for alt key
-					labelElement.title = `Alt+${label.altKey}` // Add tooltip for accessibility
-				}
+			// Optional: Add alt key functionality
+			if (label.altKey) {
+				inputElement.accessKey = label.altKey // Use accessKey for alt key
+				labelElement.title = `Alt+${label.altKey}` // Add tooltip for accessibility
+			}
 
-				this.currentLabelsElement.appendChild(inputElement)
-				this.currentLabelsElement.appendChild(labelElement)
-				this.labelElements.push(inputElement)
-			})
+			this.currentLabelsElement.appendChild(inputElement)
+			this.currentLabelsElement.appendChild(labelElement)
+			this.labelElements.push(inputElement)
 		})
 		// elements
 		this.currentSubjectElement = document.getElementById("currentSubject")
 		this.subjectDisplayDiv = document.getElementById("subjectDisplay")
-		this.currentLabelsElement = document.getElementById("currentLabels")
 		this.positionIndicatorElement = document.getElementById("positionIndicator")
 		this.placeholderImageUrl = this.currentSubjectElement.src
 		// controls

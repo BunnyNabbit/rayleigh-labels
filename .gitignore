@@ -128,5 +128,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+# deprecated. will be removed soon
 agentKeys.json
 web/labels.json

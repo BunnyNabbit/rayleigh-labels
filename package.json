@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "@atproto/api": "^0.13.35",
+    "@atproto/oauth-client-browser": "^0.3.11",
+    "dotenv": "^16.4.7",
     "events": "^3.3.0",
     "express": "^4.21.2",
     "hls.js": "^1.5.19"

@@ -1,62 +1,142 @@
-class API {
-	constructor() {
+const { Agent } = require('@atproto/api')
+
+class ClientAPI {
+	/**
+	 * @param {Agent} agent  
+	 * @param {string} labelerDid
+	 */
+	constructor(agent, labelerDid) {
+		this.agent = agent
+		this.labelerDid = labelerDid
 	}
 	async hydratePosts(uris) {
-		const response = await fetch("/hydrateposts", {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			method: "POST",
-			body: JSON.stringify({ uris })
-		})
-		if (!response.ok) {
-			throw new Error("HTTP error " + response.status)
+		for (let i = 0; i <= ClientAPI.maxRetries; i++) {
+			try {
+				const response = await this.agent.getPosts({ uris })
+				return response.data
+			} catch (error) {
+				if (i === ClientAPI.maxRetries) {
+					throw error
+				} else {
+					console.warn(`Attempt ${i + 1} failed, retrying...`)
+					await new Promise(resolve => setTimeout(resolve, 1000))
+				}
+			}
 		}
-		return await response.json()
 	}
-	async getReports(queue) {
-		const response = await fetch(`/getreports/${queue}`)
-		if (!response.ok) {
-			throw new Error("HTTP error " + response.status)
+	queryStatuses(cursor, queue) {
+		const body = {
+			limit: 100,
+			includeMuted: true,
+			sortField: "lastReportedAt",
+			sortDirection: "desc",
+			reviewState: queue
 		}
-		const json = await response.json()
-		return json
+		if (cursor) body.cursor = cursor
+		return this.agent.tools.ozone.moderation.queryStatuses(body, {
+			encoding: "application/json",
+			headers: {
+				"atproto-proxy": `${this.labelerDid}#atproto_labeler`
+			}
+		})
+	}
+	async getReports(queueParam) {
+		let queue = "tools.ozone.moderation.defs#reviewOpen"
+		if (queueParam == "escalated") {
+			queue = "tools.ozone.moderation.defs#reviewEscalated"
+		}
+		let reports = []
+		function fail() {
+			throw new Error("Failed to get queue")
+		}
+		let cursor = null
+		for (let i = 0; i <= ClientAPI.queuePages; i++) {
+			try {
+				const statusResponse = await this.queryStatuses(cursor, queue)
+				cursor = statusResponse.data.cursor
+				reports = reports.concat(statusResponse.data.subjectStatuses)
+				if (cursor) {
+					if (i == ClientAPI.queuePages) {
+						return reports
+					}
+					continue
+				} else {
+					return reports
+				}
+			} catch (error) {
+				if (i === ClientAPI.queuePages) {
+					console.error(error)
+					if (reports.length) {
+						return reports
+					} else {
+						fail()
+					}
+				} else {
+					console.warn(`Attempt ${i + 1} failed, retrying...`)
+					await new Promise(resolve => setTimeout(resolve, 1000))
+				}
+			}
+		}
+	}
+	async emitModerationEvent(uri, event) {
+		const res = await this.agent.app.bsky.feed.getPosts({ uris: [uri] })
+		const promises = res.data.posts.map(post => {
+			if (!post.cid) return Promise.resolve()
+
+			return this.agent.tools.ozone.moderation.emitEvent(
+				{
+					event: event,
+					subject: {
+						$type: "com.atproto.repo.strongRef",
+						uri,
+						cid: post.cid,
+					},
+					createdBy: this.agent.sessionManager.did,
+					createdAt: new Date().toISOString(),
+					subjectBlobCids: [],
+				},
+				{
+					encoding: "application/json",
+					headers: {
+						"atproto-proxy": `${this.labelerDid}#atproto_labeler`
+					}
+				}
+			)
+		})
+		await Promise.all(promises)
 	}
 	async label(data) {
-		const response = await fetch("/addlabel", {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			method: "POST",
-			body: JSON.stringify(data)
-		})
-		if (!response.ok) {
-			throw new Error("HTTP error " + response.status)
+		const event = {
+			$type: "tools.ozone.moderation.defs#modEventLabel",
+			createLabelVals: data.add,
+			negateLabelVals: data.negate,
 		}
-		return await response.json()
+
+		if (data.add.length || data.negate.length) {
+			await this.emitModerationEvent(data.uri, event)
+		}
+		await this.acknowledgeReport(data.uri)
+	}
+	async acknowledgeReport(uri) {
+		const event = {
+			$type: "tools.ozone.moderation.defs#modEventAcknowledge",
+		}
+
+		await this.emitModerationEvent(uri, event)
 	}
 	async escalate(uri) {
-		const response = await fetch("/escalate", {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			method: "POST",
-			body: JSON.stringify({ uri })
-		})
-		if (!response.ok) {
-			throw new Error("HTTP error " + response.status)
+		const event = {
+			$type: "tools.ozone.moderation.defs#modEventEscalate",
 		}
-		return await response.json()
+
+		await this.emitModerationEvent(uri, event)
 	}
-	getLabels() {
-		return new Promise(resolve => {
-			resolve(require("../../labels.json"))
-		})
+	static fromSession(session, labelerDid) {
+		return new ClientAPI(new Agent(session), labelerDid)
 	}
 	static bulkHydrateLimit = 25
+	static queuePages = 30
+	static maxRetries = 5
 }
 
-module.exports = API
+module.exports = ClientAPI

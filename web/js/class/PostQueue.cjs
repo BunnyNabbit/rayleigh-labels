@@ -75,6 +75,10 @@ class PostQueue {
 		add.forEach(label => post.labels.push({ val: label }))
 	}
 
+	getLabels() {
+		return this.configurationModal.getCompoundSetting("label")
+	}
+
 	static filterTransformEmbedTypes(posts) {
 		const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view", "app.bsky.embed.video#view"]
 		console.log("posts", posts)
