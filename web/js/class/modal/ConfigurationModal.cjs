@@ -320,6 +320,7 @@ class ConfigurationModal extends BaseMenuModal {
 		this.addSetting(new AccountCompound())
 		this.addSetting(new LabelCompound())
 		this.addSetting(new NumberRangeSetting("queuePreload", "Posts to preload", 50, 1, 100))
+		this.addSetting(new NumberRangeSetting("queuePages", "Queue pages", 50, 1, 300))
 		this.addSetting(new NumberRangeSetting("backQueueLimit", "Back queue size", 50, 1, 1000))
 		this.addSetting(new BooleanSetting("noises", "Enable noises", true, { requiresReload: true }))
 		this.addSetting(new SelectSetting("theme", "Theme", "Rayleigh", { list: ["Rayleigh", "Ozone"] }))

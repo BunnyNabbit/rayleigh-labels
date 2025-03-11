@@ -40,7 +40,7 @@ class ClientAPI {
 			}
 		})
 	}
-	async getReports(queueParam) {
+	async getReports(queueParam, queuePages) {
 		let queue = "tools.ozone.moderation.defs#reviewOpen"
 		if (queueParam == "escalated") {
 			queue = "tools.ozone.moderation.defs#reviewEscalated"
@@ -50,13 +50,13 @@ class ClientAPI {
 			throw new Error("Failed to get queue")
 		}
 		let cursor = null
-		for (let i = 0; i <= ClientAPI.queuePages; i++) {
+		for (let i = 0; i <= queuePages; i++) {
 			try {
 				const statusResponse = await this.queryStatuses(cursor, queue)
 				cursor = statusResponse.data.cursor
 				reports = reports.concat(statusResponse.data.subjectStatuses)
 				if (cursor) {
-					if (i == ClientAPI.queuePages) {
+					if (i == queuePages) {
 						return reports
 					}
 					continue
@@ -64,7 +64,7 @@ class ClientAPI {
 					return reports
 				}
 			} catch (error) {
-				if (i === ClientAPI.queuePages) {
+				if (i === queuePages) {
 					console.error(error)
 					if (reports.length) {
 						return reports
@@ -135,7 +135,6 @@ class ClientAPI {
 		return new ClientAPI(new Agent(session), labelerDid)
 	}
 	static bulkHydrateLimit = 25
-	static queuePages = 30
 	static maxRetries = 5
 }
 
