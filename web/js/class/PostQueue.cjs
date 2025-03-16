@@ -27,6 +27,9 @@ class PostQueue {
 		const queueType = this.configurationModal.getSetting("queue")
 		const response = await this.api.getReports(queueType, this.configurationModal.getSetting("queuePages"))
 		const tagUriCache = new Set()
+		const recordStatCache = new Map()
+		const escalateScore = this.configurationModal.getSetting("escalateCountScore")
+		const reportScore = this.configurationModal.getSetting("reportCountScore")
 		const tagList = this.configurationModal.getSetting("priorityTags").split(",")
 		response.forEach(report => {
 			report.tags.forEach(tag => {
@@ -34,6 +37,7 @@ class PostQueue {
 					tagUriCache.add(report.subject.uri)
 				}
 			})
+			recordStatCache.set(report.subject.uri, report.recordsStats)
 		})
 		let tmp = []
 		const uris = response.map(report => report.subject.uri).filter(element => element)
@@ -54,8 +58,17 @@ class PostQueue {
 			})
 		})
 		Promise.allSettled(promises).then(() => {
+			this.queue.forEach(post => {
+				let score = post.likeCount
+				const recordStats = recordStatCache.get(post.uri)
+				if (recordStats) {
+					score += recordStats.escalatedCount * escalateScore
+					score += recordStats.reportedCount * reportScore
+				}
+				post.score = score
+			})
 			this.queue = this.queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
-				.sort((a, b) => b.likeCount - a.likeCount)
+				.sort((a, b) => (b.score) - (a.score))
 				.sort((a, b) => b.tagged - a.tagged)
 		})
 		return Promise.allSettled(promises)

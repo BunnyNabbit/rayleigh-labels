@@ -331,6 +331,8 @@ class ConfigurationModal extends BaseMenuModal {
 		this.addSetting(new NumberRangeSetting("gridX", "Escalation grid X", 3, 1, 8))
 		this.addSetting(new NumberRangeSetting("gridY", "Escalation grid Y", 3, 1, 8))
 		this.addSetting(new SelectSetting("queue", "Queue", "open", { list: ["open", "escalated"] }))
+		this.addSetting(new NumberRangeSetting("escalateCountScore", "Escalate record stat score", 10, -1000, 1000))
+		this.addSetting(new NumberRangeSetting("reportCountScore", "Report record stat score", -1, -1000, 1000))
 		this.addSetting(new Text("Some settings may require a page refresh to apply."))
 		// Restrained Rayleigh. Use localStorage.setItem(`rayleighSetting:restraints`, "true") to enable
 		if (localStorage.getItem(`${Setting.keyPrefix}restraints`) == "true") { // a bit hacky, since a setting cannot be accessed if it doesn't exist
