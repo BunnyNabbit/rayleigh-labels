@@ -30,6 +30,7 @@ class PostQueue {
 		const recordStatCache = new Map()
 		const escalateScore = this.configurationModal.getSetting("escalateCountScore")
 		const reportScore = this.configurationModal.getSetting("reportCountScore")
+		const likeScore = this.configurationModal.getSetting("likeScore")
 		const tagList = this.configurationModal.getSetting("priorityTags").split(",")
 		response.forEach(report => {
 			report.tags.forEach(tag => {
@@ -59,7 +60,7 @@ class PostQueue {
 		})
 		Promise.allSettled(promises).then(() => {
 			this.queue.forEach(post => {
-				let score = post.likeCount
+				let score = post.likeCount * likeScore
 				const recordStats = recordStatCache.get(post.uri)
 				if (recordStats) {
 					score += recordStats.escalatedCount * escalateScore
