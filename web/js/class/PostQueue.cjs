@@ -38,7 +38,9 @@ class PostQueue {
 					tagUriCache.add(report.subject.uri)
 				}
 			})
-			recordStatCache.set(report.subject.uri, report.recordsStats)
+			if (typeof report.recordsStats.escalatedCount === "number") {
+				recordStatCache.set(report.subject.uri, report.recordsStats)
+			}
 		})
 		let tmp = []
 		const uris = response.map(report => report.subject.uri).filter(element => element)
