@@ -37,6 +37,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 	open() {
 		this.gridX = parseInt(this.configurationModal.getSetting("gridX"))
 		this.gridY = parseInt(this.configurationModal.getSetting("gridY"))
+		this.maxDisplayedVideos = parseInt(this.configurationModal.getSetting("maxDisplayedVideos"))
 		this.setCount = this.gridX * this.gridY
 		this.postContainer.style.gridTemplateColumns = `repeat(${this.gridX}, 1fr)`
 		this.postContainer.style.gridTemplateRows = `repeat(${this.gridY}, 1fr)`
@@ -121,6 +122,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		const renderedPosts = new Set()
 		const postMediaMap = new Map()
 		let filled = false
+		let videos = 0
 		const addPost = (media, post) => {
 			if (post.escalated) {
 				renderedPosts.add(post) // idk? seems to fix it, but for what reason?
@@ -138,6 +140,10 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					this.overflowPost = post
 					this.overflowMedia.push(media)
 					return
+				}
+				if (media.playlist) {
+					if (videos >= this.maxDisplayedVideos) return
+					videos++
 				}
 				renderedPosts.add(post)
 

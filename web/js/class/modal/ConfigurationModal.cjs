@@ -324,6 +324,7 @@ class ConfigurationModal extends BaseMenuModal {
 		this.addSetting(new NumberRangeSetting("backQueueLimit", "Back queue size", 50, 1, 1000))
 		this.addSetting(new BooleanSetting("noises", "Enable noises", true, { requiresReload: true }))
 		this.addSetting(new SelectSetting("theme", "Theme", "Rayleigh", { list: ["Rayleigh", "Ozone"] }))
+		this.addSetting(new NumberRangeSetting("maxDisplayedVideos", "Max videos to display at once", 2, 1, 64))
 		this.addSetting(new BooleanSetting("autoplay", "Autoplay videos", true))
 		this.addSetting(new BooleanSetting("unmuteVideos", "Unmute videos", false))
 		this.addSetting(new TextSetting("blurLabels", "Blur labels (Comma separated)", "!hide,!warn"))
