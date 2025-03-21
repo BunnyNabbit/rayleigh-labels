@@ -120,11 +120,18 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		let index = 0
 		const renderedPosts = new Set()
 		const postMediaMap = new Map()
+		let filled = false
 		const addPost = (media, post) => {
 			if (post.escalated) {
 				renderedPosts.add(post) // idk? seems to fix it, but for what reason?
 				return
 			}
+			// check if it would overflow
+			if (index >= this.setCount) {
+				filled = true // allows for early exit
+				return
+			}
+			// attempt to fill wizh media
 			media.forEach(media => {
 				// check if overflowing
 				if (index >= this.setCount) {
@@ -190,12 +197,13 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			})
 		}
 		if (this.overflowPost) {
-			addPost(this.overflowMedia, this.overflowPost)
+			const overflowPost = this.overflowPost
 			this.overflowPost = null
+			addPost(this.overflowMedia, overflowPost)
 		}
 		this.overflowMedia = []
 		for (let i = 0; i < set.length; i++) {
-			if (this.overflowPost) break
+			if (this.overflowPost || filled) break
 			const post = set[i]
 			addPost(post.renderImages, post)
 		}
