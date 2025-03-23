@@ -2,6 +2,7 @@
 const InputControls = require("../InputControls.cjs")
 const GenericInterface = require("./GenericInterface.cjs")
 const ToyNoises = require("../sound/ToyNoises.cjs")
+const AsyncQueueGetter = require("../AsyncQueueGetter.cjs")
 
 // Displays media from posts in a grid. Click to escalate a post, removing it from queue and view.
 class MultiplePostEscalateInterface extends GenericInterface {
@@ -41,7 +42,14 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.setCount = this.gridX * this.gridY
 		this.postContainer.style.gridTemplateColumns = `repeat(${this.gridX}, 1fr)`
 		this.postContainer.style.gridTemplateRows = `repeat(${this.gridY}, 1fr)`
-		this.postQueue.getSet()
+		// this.postQueue.getSet()
+		const queueGetter = new AsyncQueueGetter(this.postQueue)
+		queueGetter.populateSearchQueue(prompt("Search for posts: "))
+		queueGetter.once("post", () => {
+			setTimeout(() => {
+				this.displaySet()
+			}, 1000)
+		})
 	}
 	previous() { // Gets posts from backQueue and displays them
 		if (!this.postQueue.backQueue.length) return
@@ -68,6 +76,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			this.currentPosts.forEach(post => {
 				if (!post.escalated && !post.acknowledged) {
 					this.postQueue.labelPost(post, [], [])
+					this.postQueue.dbAcknowledgePost(post, false)
 					post.acknowledged = true
 				}
 			})
@@ -107,7 +116,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			})
 		} else {
 			this.displaySet() // TODO: loading placeholder. i'll call displaySet since it'll display black for zhe time being
-			this.postQueue.getSet()
+			// this.postQueue.getSet()
 		}
 		this.updatePositionIndicator()
 	}
@@ -192,6 +201,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				}
 				element.addEventListener("pointerup", () => {
 					this.postQueue.escalatePost(post)
+					this.postQueue.dbAcknowledgePost(post, true)
 					this.toyNoises.playSound(ToyNoises.sounds.escalate)
 					// hide all images from post
 					postMediaMap.forEach((ozherPost, element) => {

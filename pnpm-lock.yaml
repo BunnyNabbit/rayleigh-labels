@@ -14,6 +14,9 @@ importers:
       '@atproto/oauth-client-browser':
         specifier: ^0.3.11
         version: 0.3.11
+      dexie:
+        specifier: ^4.0.11
+        version: 4.0.11
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
@@ -738,6 +741,9 @@ packages:
 
   detect-node@2.1.0:
     resolution: {integrity: sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==}
+
+  dexie@4.0.11:
+    resolution: {integrity: sha512-SOKO002EqlvBYYKQSew3iymBoN2EQ4BDw/3yprjh7kAfFzjBYkaMNa/pZvcA7HSWlcKSQb9XhPe3wKyQ0x4A8A==}
 
   dns-packet@5.6.1:
     resolution: {integrity: sha512-l4gcSouhcgIKRvyy99RNVOgxXiicE+2jZoNmaNmZ6JXiGajBOJAesk1OBlJuM5k2c+eudGdLxDqXuPCKIj6kpw==}
@@ -2752,6 +2758,8 @@ snapshots:
     optional: true
 
   detect-node@2.1.0: {}
+
+  dexie@4.0.11: {}
 
   dns-packet@5.6.1:
     dependencies:

@@ -1,5 +1,6 @@
 const API = require("./API.cjs")
 const { randomIntFromInterval, chunkArray } = require("../utils.cjs")
+const db = require("../db.cjs")
 
 class PostQueue {
 	constructor(api, configurationModal) {
@@ -83,6 +84,10 @@ class PostQueue {
 		post.escalated = true
 	}
 
+	dbAcknowledgePost(post, resolution) {
+		return db.acknowledgedPosts.put({ uri: post.uri, resolution }) // add skipped posts from escalation queue-NOT-labeling
+	}
+
 	labelPost(post, add, negate) {
 		this.api.label({
 			add, negate, uri: post.uri
@@ -113,6 +118,11 @@ class PostQueue {
 				}
 				if (post.embed.media["$type"] == "app.bsky.embed.video#view") {
 					post.renderImages = [post.embed.media]
+				}
+				if (post.embed.media["$type"] == "app.bsky.embed.external#view" && post.embed.media["$type"].external.thumb) {
+					post.renderImages = [{
+						fullsize: post.embed.media["$type"].external.thumb
+					}]
 				}
 			}
 			if (type == "app.bsky.embed.video#view") {

@@ -132,6 +132,15 @@ class ClientAPI {
 
 		await this.emitModerationEvent(uri, event)
 	}
+	async searchPosts(query, cursor) {
+		const body = {
+			q: query,
+			limit: 100,
+			sort: "recent",
+		}
+		if (cursor) body.cursor = cursor
+		return this.agent.app.bsky.feed.searchPosts(body)
+	}
 	static fromSession(session, labelerDid) {
 		return new ClientAPI(new Agent(session), labelerDid)
 	}
