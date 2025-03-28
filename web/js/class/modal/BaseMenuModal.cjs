@@ -1,7 +1,9 @@
 const ToyNoises = require("../sound/ToyNoises.cjs")
+const EventEmitter = require("events")
 
-class BaseMenuModal {
+class BaseMenuModal extends EventEmitter {
 	constructor(preventDialogClose, toyNoises) {
+		super()
 		this.toyNoises = toyNoises
 		this.modal = document.createElement("dialog")
 		document.body.appendChild(this.modal)
@@ -33,6 +35,10 @@ class BaseMenuModal {
 	close() {
 		this.modal.close()
 		return this.modal
+	}
+
+	destroy() {
+		this.modal.remove()
 	}
 }
 

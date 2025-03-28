@@ -2,7 +2,6 @@
 const InputControls = require("../InputControls.cjs")
 const GenericInterface = require("./GenericInterface.cjs")
 const ToyNoises = require("../sound/ToyNoises.cjs")
-const AsyncQueueGetter = require("../AsyncQueueGetter.cjs")
 
 // Displays media from posts in a grid. Click to escalate a post, removing it from queue and view.
 class MultiplePostEscalateInterface extends GenericInterface {
@@ -42,10 +41,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.setCount = this.gridX * this.gridY
 		this.postContainer.style.gridTemplateColumns = `repeat(${this.gridX}, 1fr)`
 		this.postContainer.style.gridTemplateRows = `repeat(${this.gridY}, 1fr)`
-		// this.postQueue.getSet()
-		const queueGetter = new AsyncQueueGetter(this.postQueue)
-		queueGetter.populateSearchQueue(prompt("Search for posts: "))
-		queueGetter.once("post", () => {
+		this.postQueue.populator.once("post", () => {
 			setTimeout(() => {
 				this.displaySet()
 			}, 1000)

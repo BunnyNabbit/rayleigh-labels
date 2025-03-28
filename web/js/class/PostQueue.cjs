@@ -1,5 +1,4 @@
-const API = require("./API.cjs")
-const { randomIntFromInterval, chunkArray } = require("../utils.cjs")
+const { randomIntFromInterval } = require("../utils.cjs")
 const db = require("../db.cjs")
 
 class PostQueue {
@@ -9,10 +8,13 @@ class PostQueue {
 		this.queue = []
 		this.backQueue = []
 		this.interface = null
+		this.runningPopulator = null
 	}
 	// Get the next set of posts
 	getSet() {
 		this.populateQueue().then(() => {
+			console.log("Queue populated")
+			this.runningPopulator = null
 			if (this.queue[0]) {
 				this.interface.displaySet()
 			} else {
@@ -25,58 +27,13 @@ class PostQueue {
 	}
 
 	async populateQueue() {
-		const queueType = this.configurationModal.getSetting("queue")
-		const response = await this.api.getReports(queueType, this.configurationModal.getSetting("queuePages"))
-		const tagUriCache = new Set()
-		const recordStatCache = new Map()
-		const escalateScore = this.configurationModal.getSetting("escalateCountScore")
-		const reportScore = this.configurationModal.getSetting("reportCountScore")
-		const likeScore = this.configurationModal.getSetting("likeScore")
-		const tagList = this.configurationModal.getSetting("priorityTags").split(",")
-		response.forEach(report => {
-			report.tags.forEach(tag => {
-				if (tagList.includes(tag)) {
-					tagUriCache.add(report.subject.uri)
-				}
-			})
-			if (typeof report.recordsStats.escalatedCount === "number") {
-				recordStatCache.set(report.subject.uri, report.recordsStats)
-			}
-		})
-		let tmp = []
-		const uris = response.map(report => report.subject.uri).filter(element => element)
-		const promises = []
-		chunkArray(uris, API.bulkHydrateLimit).forEach(postChunk => {
-			const hydratePromise = this.api.hydratePosts(postChunk)
-			promises.push(hydratePromise)
-			hydratePromise.then(response => {
-				const posts = response.posts
-				const filteredPosts = PostQueue.filterTransformEmbedTypes(posts)
-				const missingUris = postChunk.filter(uri => !posts.some(post => post.uri == uri))
-				tmp = tmp.concat(missingUris.filter(uri => uri.includes("/app.bsky.feed.post/")))
-				console.log({ missingUris: tmp.join(",") })
-				filteredPosts.forEach(post => {
-					post.tagged = tagUriCache.has(post.uri)
-					this.queue.push(post)
-				})
-			})
-		})
-		Promise.allSettled(promises).then(() => {
-			this.queue.forEach(post => {
-				let score = post.likeCount * likeScore
-				const recordStats = recordStatCache.get(post.uri)
-				if (recordStats) {
-					score += recordStats.escalatedCount * escalateScore
-					score += recordStats.reportedCount * reportScore
-				}
-				post.score = score
-			})
-			this.queue = this.queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
-				.sort((a, b) => (b.score) - (a.score))
-				.sort((a, b) => b.tagged - a.tagged)
-		})
-		return Promise.allSettled(promises)
-
+		if (this.populator.running) {
+			console.log("using promise")
+			return this.runningPopulator
+		}
+		console.log("running")
+		this.runningPopulator = this.populator.populate()
+		await this.runningPopulator
 	}
 
 	escalatePost(post) {
