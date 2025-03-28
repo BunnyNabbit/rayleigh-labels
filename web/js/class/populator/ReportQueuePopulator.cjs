@@ -5,11 +5,11 @@ const API = require("../API.cjs")
 
 class SearchPopulator extends BaseQueuePopulator {
 	constructor(postQueue) {
-      super(postQueue)
+		super(postQueue)
 	}
-   async populate() {
-      super.populate()
-      const queueType = this.postQueue.configurationModal.getSetting("queue")
+	async populate() {
+		super.populate()
+		const queueType = this.postQueue.configurationModal.getSetting("queue")
 		const response = await this.postQueue.api.getReports(queueType, this.postQueue.configurationModal.getSetting("queuePages"))
 		const tagUriCache = new Set()
 		const recordStatCache = new Map()
@@ -41,27 +41,25 @@ class SearchPopulator extends BaseQueuePopulator {
 				console.log({ missingUris: reportQueue.join(",") })
 				filteredPosts.forEach(post => {
 					post.tagged = tagUriCache.has(post.uri)
-               this.postQueue.queue.push(post)
-               this.emit("post", post)
+					this.postQueue.queue.push(post)
+					this.emit("post", post)
 				})
 			})
-      })
+		})
 		await Promise.allSettled(promises)
-      this.emit("sort", () => {
-			this.postQueue.queue.forEach(post => {
-				let score = post.likeCount * likeScore
-				const recordStats = recordStatCache.get(post.uri)
-				if (recordStats) {
-					score += recordStats.escalatedCount * escalateScore
-					score += recordStats.reportedCount * reportScore
-				}
-				post.score = score
-			})
-			this.postQueue.queue = this.postQueue.queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
-				.sort((a, b) => (b.score) - (a.score))
-				.sort((a, b) => b.tagged - a.tagged)
-      })
-      this.running = false
+		this.postQueue.queue.forEach(post => {
+			let score = post.likeCount * likeScore
+			const recordStats = recordStatCache.get(post.uri)
+			if (recordStats) {
+				score += recordStats.escalatedCount * escalateScore
+				score += recordStats.reportedCount * reportScore
+			}
+			post.score = score
+		})
+		this.postQueue.queue = this.postQueue.queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
+			.sort((a, b) => (b.score) - (a.score))
+			.sort((a, b) => b.tagged - a.tagged)
+		this.running = false
 	}
 	static sleep(ms) {
 		return new Promise(resolve => setTimeout(resolve, ms))
