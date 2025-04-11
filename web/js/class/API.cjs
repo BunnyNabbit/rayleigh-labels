@@ -1,4 +1,5 @@
 const { Agent } = require('@atproto/api')
+const EventQueue = require('./EventQueue.cjs')
 
 class ClientAPI {
 	/**
@@ -9,6 +10,7 @@ class ClientAPI {
 		this.agent = agent
 		this.labelerDid = labelerDid
 		this.agent.addLabeler(labelerDid)
+		this.eventQueue = new EventQueue()
 	}
 	async hydratePosts(uris) {
 		for (let i = 0; i <= ClientAPI.maxRetries; i++) {
@@ -80,31 +82,33 @@ class ClientAPI {
 		}
 	}
 	async emitModerationEvent(uri, event) {
-		const res = await this.agent.app.bsky.feed.getPosts({ uris: [uri] })
-		const promises = res.data.posts.map(post => {
-			if (!post.cid) return Promise.resolve()
+		this.eventQueue.enqueue(async () => {
+			const res = await this.agent.app.bsky.feed.getPosts({ uris: [uri] })
+			const promises = res.data.posts.map(post => {
+				if (!post.cid) return Promise.resolve()
 
-			return this.agent.tools.ozone.moderation.emitEvent(
-				{
-					event: event,
-					subject: {
-						$type: "com.atproto.repo.strongRef",
-						uri,
-						cid: post.cid,
+				return this.agent.tools.ozone.moderation.emitEvent(
+					{
+						event: event,
+						subject: {
+							$type: "com.atproto.repo.strongRef",
+							uri,
+							cid: post.cid,
+						},
+						createdBy: this.agent.sessionManager.did,
+						createdAt: new Date().toISOString(),
+						subjectBlobCids: [],
 					},
-					createdBy: this.agent.sessionManager.did,
-					createdAt: new Date().toISOString(),
-					subjectBlobCids: [],
-				},
-				{
-					encoding: "application/json",
-					headers: {
-						"atproto-proxy": `${this.labelerDid}#atproto_labeler`
+					{
+						encoding: "application/json",
+						headers: {
+							"atproto-proxy": `${this.labelerDid}#atproto_labeler`
+						}
 					}
-				}
-			)
+				)
+			})
+			await Promise.all(promises)
 		})
-		await Promise.all(promises)
 	}
 	async label(data) {
 		const event = {
