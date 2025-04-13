@@ -13,8 +13,34 @@
 			margin: 0;
 		}
 
+		:root {
+			--background-color: black;
+			--text-color: white;
+			--text-shadow: 0px 2px 2px blue;
+			--label-background-color: #000000;
+			--label-text-color: #ffffff;
+			--label-border-color: #33333375;
+			--alt-text-fallback-color: #a5a5a5;
+
+			--dialog-background-color: #13152b;
+			--dialog-border-color: #202449;
+			--dialog-text-color: #ffffff;
+			--dialog-backdrop-gradient: radial-gradient(circle,rgba(32, 36, 73, 0.64) 0%, rgba(32, 36, 73, 0.45) 21%, rgba(32, 36, 73, 0.18) 46%);
+		}
+
+		dialog {
+			background-color: var(--dialog-background-color);
+			border-color: var(--dialog-border-color);
+			color: var(--dialog-text-color);
+			font-family: Arial, Helvetica, sans-serif;
+		}
+
+		dialog::backdrop {
+			background: var(--dialog-backdrop-gradient);
+		}
+
 		body {
-			background-color: black;
+			background-color: var(--background-color);
 		}
 
 		/* https://stackoverflow.com/a/18490463 */
@@ -46,7 +72,7 @@
 		.font {
 			font-family: Arial, Helvetica, sans-serif;
 			color: white;
-			text-shadow: 0px 2px 2px blue
+			text-shadow: var(--text-shadow);
 		}
 
 		.current-labels {
@@ -95,7 +121,7 @@
 		}
 
 		img[alt], video[alt] {
-			color: rgb(165, 165, 165);
+			color: var(--alt-text-fallback-color);
 		}
 	</style>
 </head>
