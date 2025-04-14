@@ -7,16 +7,15 @@ class MainMenuModal extends BaseMenuModal {
 		super(true, toyNoises)
 	}
 
-	addConfigurationButton(configurationModal) {
-		this.configurationModal = configurationModal
-		this.configurationModal.previousMenu = this
-		const button = document.createElement("button")
-		button.textContent = "Configuration"
-		button.onclick = () => {
-			this.close()
-			configurationModal.open()
-		}
-		this.modal.appendChild(button)
+	addConfigurationButton(modal) {
+		this.configurationModal = modal
+		this.addModalButton(modal, "Configuration")
+	}
+
+	addModalButton(modal, label) {
+		this.addButton(label, () => {
+			modal.open()
+		})
 	}
 
 	addAgent(agent, labelerDid) {

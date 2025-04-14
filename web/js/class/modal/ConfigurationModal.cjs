@@ -311,7 +311,6 @@ class LabelCompound extends CompoundSetting {
 class ConfigurationModal extends BaseMenuModal {
 	constructor() {
 		super()
-		this.previousMenu = null
 		this.settings = []
 		this.modal.classList.add("configurationModal")
 		this.addCloseButton()
@@ -347,7 +346,6 @@ class ConfigurationModal extends BaseMenuModal {
 			this.addSetting(new TextSetting("postViewTimeTrigger", "Trigger code", "alert(\"Be for real.\")"))
 		}
 		this.renderSettings()
-		this.modal.addEventListener("close", () => this.previousMenu?.open())
 	}
 
 	addSetting(setting) {
@@ -410,10 +408,6 @@ class ConfigurationModal extends BaseMenuModal {
 				this.renderSetting(setting)
 			}
 		}
-	}
-
-	close() {
-		super.close()
 	}
 }
 
