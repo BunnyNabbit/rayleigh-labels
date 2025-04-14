@@ -27,14 +27,6 @@ class PopulatorQuestionModal extends BaseMenuModal {
          this.emit("earlyExit")
       }
    }
-
-   addButton(text, func) {
-      const button = document.createElement("button")
-      button.textContent = text
-      button.onclick = func
-      this.modal.appendChild(button)
-      return button
-   }
 }
 
 module.exports = PopulatorQuestionModal

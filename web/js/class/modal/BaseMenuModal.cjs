@@ -27,6 +27,14 @@ class BaseMenuModal extends EventEmitter {
 		return closeButton
 	}
 
+	addButton(text, func) {
+      const button = document.createElement("button")
+      button.textContent = text
+      button.onclick = func
+      this.modal.appendChild(button)
+      return button
+   }
+
 	open() {
 		this.modal.showModal()
 		return this.modal
