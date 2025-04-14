@@ -37,9 +37,6 @@ class MainMenuModal extends BaseMenuModal {
 				this.close()
 				rInterface.open()
 			})
-			questionModal.on("earlyExit", () => {
-				this.open()
-			})
 			questionModal.open()
 		}
 		this.modal.appendChild(button)

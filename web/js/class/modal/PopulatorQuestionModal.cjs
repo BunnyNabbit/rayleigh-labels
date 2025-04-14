@@ -4,7 +4,7 @@ const ReportQueuePopulator = require("../populator/ReportQueuePopulator.cjs")
 
 class PopulatorQuestionModal extends BaseMenuModal {
    constructor(toyNoises) {
-      super(true, toyNoises)
+      super(false, toyNoises)
       this.addCloseButton()
       this.modal.addEventListener("close", () => this.destroy())
       this.addButton("Ozone report queue", () => {
@@ -19,13 +19,6 @@ class PopulatorQuestionModal extends BaseMenuModal {
          })
          this.close()
       })
-   }
-
-   addCloseButton() {
-      const closeButton = super.addCloseButton()
-      closeButton.onclick = () => {
-         this.emit("earlyExit")
-      }
    }
 
    addButton(text, func) {
