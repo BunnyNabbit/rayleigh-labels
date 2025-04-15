@@ -72,22 +72,16 @@ class StreamReader extends GrowBuffer {
 		return trimmed
 	}
 	async read(chunkSize = 1024) {
-		let totalBytesRead = 0
-		while (this.currentSize < chunkSize) {
+		while (this.remainingBufferedBytes < chunkSize) {
 			const { done, value } = await this.reader.read()
 			if (done) {
 				break
 			}
 			this.writeBytes(value)
-			totalBytesRead += value.length
-		}
-
-		if (totalBytesRead > 0) {
-			return this.buffer.subarray(this.writeCursor - totalBytesRead, this.writeCursor)
 		}
 	}
 	async readBytes(num) {
-		if (this.currentSize < num) {
+		if (this.remainingBufferedBytes < num) {
 			await this.read(num)
 		}
 		const bytes = this.buffer.subarray(this.bufferReadBytes, this.bufferReadBytes + num)
@@ -95,7 +89,7 @@ class StreamReader extends GrowBuffer {
 		return bytes
 	}
 	async readUint32() {
-		if (this.currentSize < 4) {
+		if (this.remainingBufferedBytes < 4) {
 			await this.read(4)
 		}
 		const view = new DataView(this.buffer.buffer, this.bufferReadBytes, 4)
@@ -105,7 +99,7 @@ class StreamReader extends GrowBuffer {
 	}
 	async readString(length = false) {
 		if (length) {
-			if (this.currentSize < length) {
+			if (this.remainingBufferedBytes < length) {
 				await this.read(length)
 			}
 			const bytes = this.buffer.subarray(this.bufferReadBytes, this.bufferReadBytes + length)
@@ -116,10 +110,12 @@ class StreamReader extends GrowBuffer {
 			if (this.currentSize < stringLength) {
 				await this.read(stringLength)
 			}
-			const bytes = this.buffer.subarray(this.bufferReadBytes, this.bufferReadBytes + stringLength)
-			this.bufferReadBytes += stringLength
-			return new TextDecoder().decode(bytes)
+			const string = await this.readString(stringLength)
+			return string
 		}
+	}
+	get remainingBufferedBytes() {
+		return this.currentSize - this.bufferReadBytes
 	}
 	async close() {
 		await this.reader.cancel()
