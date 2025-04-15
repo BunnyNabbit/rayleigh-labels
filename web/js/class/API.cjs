@@ -81,36 +81,36 @@ class ClientAPI {
 			}
 		}
 	}
-	async emitModerationEvent(uri, event) {
+	async emitModerationEvent(uri, event, cid) {
 		this.eventQueue.enqueue(async () => {
-			const res = await this.agent.app.bsky.feed.getPosts({ uris: [uri] })
-			const promises = res.data.posts.map(post => {
-				if (!post.cid) return Promise.resolve()
+			if (!cid) {
+				const res = await this.agent.app.bsky.feed.getPosts({ uris: [uri] })
+				cid = res.data.posts[0].cid
+			}
+			if (!cid) return Promise.resolve()
 
-				return this.agent.tools.ozone.moderation.emitEvent(
-					{
-						event: event,
-						subject: {
-							$type: "com.atproto.repo.strongRef",
-							uri,
-							cid: post.cid,
-						},
-						createdBy: this.agent.sessionManager.did,
-						createdAt: new Date().toISOString(),
-						subjectBlobCids: [],
+			return this.agent.tools.ozone.moderation.emitEvent(
+				{
+					event: event,
+					subject: {
+						$type: "com.atproto.repo.strongRef",
+						uri,
+						cid: cid,
 					},
-					{
-						encoding: "application/json",
-						headers: {
-							"atproto-proxy": `${this.labelerDid}#atproto_labeler`
-						}
+					createdBy: this.agent.sessionManager.did,
+					createdAt: new Date().toISOString(),
+					subjectBlobCids: [],
+				},
+				{
+					encoding: "application/json",
+					headers: {
+						"atproto-proxy": `${this.labelerDid}#atproto_labeler`
 					}
-				)
-			})
-			await Promise.all(promises)
+				}
+			)
 		})
 	}
-	async label(data) {
+	async label(data, cid) {
 		const event = {
 			$type: "tools.ozone.moderation.defs#modEventLabel",
 			createLabelVals: data.add,
@@ -118,23 +118,23 @@ class ClientAPI {
 		}
 
 		if (data.add.length || data.negate.length) {
-			await this.emitModerationEvent(data.uri, event)
+			await this.emitModerationEvent(data.uri, event, cid)
 		}
-		await this.acknowledgeReport(data.uri)
+		await this.acknowledgeReport(data.uri, cid)
 	}
-	async acknowledgeReport(uri) {
+	async acknowledgeReport(uri, cid) {
 		const event = {
 			$type: "tools.ozone.moderation.defs#modEventAcknowledge",
 		}
 
-		await this.emitModerationEvent(uri, event)
+		await this.emitModerationEvent(uri, event, cid)
 	}
-	async escalate(uri) {
+	async escalate(uri, cid) {
 		const event = {
 			$type: "tools.ozone.moderation.defs#modEventEscalate",
 		}
 
-		await this.emitModerationEvent(uri, event)
+		await this.emitModerationEvent(uri, event, cid)
 	}
 	async searchPosts(query, cursor) {
 		const body = {

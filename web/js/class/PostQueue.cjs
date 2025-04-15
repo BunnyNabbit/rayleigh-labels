@@ -37,7 +37,7 @@ class PostQueue {
 	}
 
 	escalatePost(post) {
-		this.api.escalate(post.uri)
+		this.api.escalate(post.uri, post.cid)
 		post.escalated = true
 	}
 
@@ -48,7 +48,7 @@ class PostQueue {
 	labelPost(post, add, negate) {
 		this.api.label({
 			add, negate, uri: post.uri
-		})
+		}, post.cid)
 		post.labels = post.labels.filter(label => !negate.includes(label.val))
 		add.forEach(label => post.labels.push({ val: label }))
 	}
