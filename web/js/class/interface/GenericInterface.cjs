@@ -54,30 +54,36 @@ class GenericInterface {
 		let imagesPreloaded = 0
 		for (let i = 1; i < this.postQueue.queue.length; i++) {
 			const post = this.postQueue.queue[i]
-			if (!post.preloaded && !post.renderImages[0].playlist) {
-				post.preloaded = true
-				post.renderImages.forEach(media => {
-					this.preloadMedia(media)
-				})
+			if (!post.renderImages[0].playlist) {
 				imagesPreloaded++
 				if (imagesPreloaded == parseInt(this.configurationModal.getSetting("queuePreload"))) {
 					break
 				}
+				if (post.preloaded) {
+					continue
+				}
+				post.preloaded = true
+				post.renderImages.forEach(media => {
+					this.preloadMedia(media)
+				})
 			}
 		}
 		// videos
 		let videosPreloaded = 0
 		for (let i = 1; i < this.postQueue.queue.length; i++) {
 			const post = this.postQueue.queue[i]
-			if (!post.preloaded && post.renderImages[0].playlist) {
-				post.preloaded = true
-				post.renderImages.forEach(media => {
-					this.preloadMedia(media)
-				})
+			if (post.renderImages[0].playlist) {
 				videosPreloaded++
 				if (videosPreloaded == parseInt(this.configurationModal.getSetting("videoPreload"))) {
 					break
 				}
+				if (post.preloaded) {
+					continue
+				}
+				post.preloaded = true
+				post.renderImages.forEach(media => {
+					this.preloadMedia(media)
+				})
 			}
 		}
 	}
