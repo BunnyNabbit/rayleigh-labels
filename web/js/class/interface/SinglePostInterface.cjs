@@ -158,15 +158,7 @@ class SinglePostInterface extends GenericInterface {
 		this.currentPost.labels = this.labelElements.filter(element => element.checked == true).map(element => { return { val: element.id } })
 		if (this.postQueue.queue[0]) {
 			this.displayPost(this.postQueue.queue[0])
-			// preload next posts
-			for (let i = 1; i < parseInt(this.configurationModal.getSetting("queuePreload")); i++) {
-				if (this.postQueue.queue[i] && !this.postQueue.queue[i].preloaded) {
-					this.postQueue.queue[i].preloaded = true
-					this.postQueue.queue[i].renderImages.forEach(media => {
-						this.preloadMedia(media)
-					})
-				}
-			}
+			this.preloadNextPosts()
 		} else {
 			this.currentPost = null
 			this.postQueue.getSet()

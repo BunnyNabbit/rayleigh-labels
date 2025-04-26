@@ -77,15 +77,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				}
 			})
 			this.displaySet()
-			// preload next posts
-			for (let i = 1; i < parseInt(this.configurationModal.getSetting("queuePreload")); i++) {
-				if (this.postQueue.queue[i] && !this.postQueue.queue[i].preloaded) {
-					this.postQueue.queue[i].preloaded = true
-					this.postQueue.queue[i].renderImages.forEach(media => {
-						this.preloadMedia(media)
-					})
-				}
-			}
+			this.preloadNextPosts()
 			// trim back queue
 			const backQueueLimit = parseInt(this.configurationModal.getSetting("backQueueLimit"))
 			if (this.postQueue.backQueue.length > backQueueLimit) {

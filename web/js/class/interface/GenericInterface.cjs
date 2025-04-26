@@ -49,6 +49,38 @@ class GenericInterface {
 			this.labelElements.push(inputElement)
 		})
 	}
+	preloadNextPosts() {
+		// preload next posts
+		let imagesPreloaded = 0
+		for (let i = 1; i < this.postQueue.queue.length; i++) {
+			const post = this.postQueue.queue[i]
+			if (!post.preloaded && !post.renderImages[0].playlist) {
+				post.preloaded = true
+				post.renderImages.forEach(media => {
+					this.preloadMedia(media)
+				})
+				imagesPreloaded++
+				if (imagesPreloaded == parseInt(this.configurationModal.getSetting("queuePreload"))) {
+					break
+				}
+			}
+		}
+		// videos
+		let videosPreloaded = 0
+		for (let i = 1; i < this.postQueue.queue.length; i++) {
+			const post = this.postQueue.queue[i]
+			if (!post.preloaded && post.renderImages[0].playlist) {
+				post.preloaded = true
+				post.renderImages.forEach(media => {
+					this.preloadMedia(media)
+				})
+				videosPreloaded++
+				if (videosPreloaded == parseInt(this.configurationModal.getSetting("videoPreload"))) {
+					break
+				}
+			}
+		}
+	}
 	preloadMedia(media) {
 		if (media.fullsize) {
 			const img = document.createElement("img")
