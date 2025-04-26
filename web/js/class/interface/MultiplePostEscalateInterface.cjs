@@ -91,13 +91,15 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			if (this.postQueue.backQueue.length > backQueueLimit) {
 				const removed = this.postQueue.backQueue.splice(backQueueLimit)
 				removed.forEach(removedPost => {
-					if (removedPost.renderImages[0].videoCache) {
-						removedPost.renderImages[0].videoCache.remove()
-						// Destroy HLS context
-						if (removedPost.renderImages[0].hls) {
-							removedPost.renderImages[0].hls.destroy()
+					removedPost.renderImages.forEach(media => {
+						if (media.elementCache) {
+							media.elementCache.remove()
+							// Destroy HLS context
+							if (media.hls) {
+								media.hls.destroy()
+							}
 						}
-					}
+					})
 				})
 			}
 			// remove current posts from queue
@@ -169,8 +171,8 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				})
 				postMediaMap.set(element, post)
 				if (media.playlist) { // video
-					if (!media.videoCache) this.preloadMedia(media)
-					const video = media.videoCache
+					if (!media.elementCache) this.preloadMedia(media)
+					const video = media.elementCache
 					video.classList.remove("hidden")
 					try {
 						video.play()
@@ -187,8 +189,9 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					video.style.height = "100%"
 					element.appendChild(video)
 				} else if (media.fullsize) { // image
-					const image = document.createElement("img")
-					image.src = media.fullsize
+					if (!media.elementCache) this.preloadMedia(media)
+					const image = media.elementCache
+					image.classList.remove("hidden")
 					image.title = media.alt
 					image.alt = media.alt
 					image.style.width = "100%"

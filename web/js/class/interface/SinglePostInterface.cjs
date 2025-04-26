@@ -11,6 +11,7 @@ class SinglePostInterface extends GenericInterface {
 		this.toyNoises = toyNoises
 		this.currentPosition = 0
 		this.currentVideoSubjectElement = null
+		this.currentSubjectElement = null
 		// populate labels
 		this.labelElements = []
 		const labels = this.postQueue.getLabels()
@@ -38,10 +39,8 @@ class SinglePostInterface extends GenericInterface {
 			this.labelElements.push(inputElement)
 		})
 		// elements
-		this.currentSubjectElement = document.getElementById("currentSubject")
 		this.subjectDisplayDiv = document.getElementById("subjectDisplay")
 		this.positionIndicatorElement = document.getElementById("positionIndicator")
-		this.placeholderImageUrl = this.currentSubjectElement.src
 		// controls
 		this.control = new InputControls(postQueue)
 		this.control.on("switchPostImage", (direction) => {
@@ -79,12 +78,15 @@ class SinglePostInterface extends GenericInterface {
 			this.currentVideoSubjectElement.pause()
 			this.currentVideoSubjectElement = null
 		}
+		if (this.currentSubjectElement) {
+			this.currentSubjectElement.classList.add("hidden")
+			this.currentSubjectElement = null
+		}
 		const media = this.currentPost.renderImages[this.currentPosition]
 		if (media.playlist) {
-			if (!media.videoCache) this.preloadMedia(media)
-			media.videoCache.classList.add("fullscreen-image")
-			const video = media.videoCache
-			this.currentSubjectElement.classList.add("hidden")
+			if (!media.elementCache) this.preloadMedia(media)
+			media.elementCache.classList.add("fullscreen-image")
+			const video = media.elementCache
 			video.classList.remove("hidden")
 			video.play()
 			video.playbackRate = 2
@@ -95,10 +97,13 @@ class SinglePostInterface extends GenericInterface {
 			}
 			this.currentVideoSubjectElement = video
 		} else {
-			this.currentSubjectElement.classList.remove("hidden")
-			this.currentSubjectElement.src = media.fullsize
-			this.currentSubjectElement.title = media.alt
-			this.currentSubjectElement.alt = media.alt
+			if (!media.elementCache) this.preloadMedia(media)
+			const image = media.elementCache
+			image.classList.remove("hidden")
+			image.classList.add("fullscreen-image")
+			image.title = media.alt
+			image.alt = media.alt
+			this.currentSubjectElement = image
 		}
 
 		this.updatePositionIndicator(this.currentPost)
@@ -135,13 +140,15 @@ class SinglePostInterface extends GenericInterface {
 		this.postQueue.backQueue.push(post)
 		if (this.postQueue.backQueue.length > parseInt(this.configurationModal.getSetting("backQueueLimit"))) {
 			const removedPost = this.postQueue.backQueue.shift()
-			if (removedPost.renderImages[0].videoCache) {
-				removedPost.renderImages[0].videoCache.remove()
-				// Destroy HLS context
-				if (removedPost.renderImages[0].hls) {
-					removedPost.renderImages[0].hls.destroy()
+			removedPost.renderImages.forEach(media => {
+				if (media.elementCache) {
+					media.elementCache.remove()
+					// Destroy HLS context
+					if (media.hls) {
+						media.hls.destroy()
+					}
 				}
-			}
+			})
 		}
 		const postLabels = this.currentPost.labels
 		const currentLabelValues = this.labelElements.map(element => { return { name: element.id, checked: element.checked } })
@@ -162,7 +169,6 @@ class SinglePostInterface extends GenericInterface {
 			}
 		} else {
 			this.currentPost = null
-			this.currentSubjectElement.src = this.placeholderImageUrl
 			this.postQueue.getSet()
 		}
 	}

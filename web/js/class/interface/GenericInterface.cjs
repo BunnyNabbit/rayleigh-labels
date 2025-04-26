@@ -51,8 +51,11 @@ class GenericInterface {
 	}
 	preloadMedia(media) {
 		if (media.fullsize) {
-			const preloadImage = new Image()
-			preloadImage.src = media.fullsize
+			const img = document.createElement("img")
+			img.src = media.fullsize
+			img.classList.add("hidden")
+			media.elementCache = img
+			this.container.appendChild(img)
 		}
 		if (media.playlist) {
 			const video = document.createElement("video")
@@ -64,7 +67,7 @@ class GenericInterface {
 			preloadHls.loadSource(media.playlist)
 			preloadHls.attachMedia(video)
 			this.container.appendChild(video)
-			media.videoCache = video
+			media.elementCache = video
 			media.hls = preloadHls
 		}
 		return media
