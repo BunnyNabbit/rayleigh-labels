@@ -70,7 +70,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			this.postQueue.backQueue.unshift(...this.currentPosts) // add current posts to back queue
 			// acknowledge current posts which have not been escalated
 			this.currentPosts.forEach(post => {
-				if (!post.escalated && !post.acknowledged) {
+				if (!post.escalated && !post.acknowledged && !post.renderImages.some(media => media.loaded == false)) {
 					this.postQueue.labelPost(post, [], [])
 					this.postQueue.dbAcknowledgePost(post, false)
 					post.acknowledged = true
