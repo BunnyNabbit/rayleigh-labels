@@ -187,8 +187,8 @@ class DatabaseDump {
 			lengthBuffer.writeUint32(postCount)
 			await deflateStreamWriter.write(lengthBuffer.toBuffer())
 			// data (1000 items per chunk)
-			for (let i = 0; i < postCount; i += 1000) {
-				const posts = await db.acknowledgedPosts.offset(i).limit(1000).toArray()
+			for (let i = 0; i < postCount; i += 10000) {
+				const posts = await db.acknowledgedPosts.offset(i).limit(10000).toArray()
 				const postsBuffer = new GrowBuffer(1024, 1024)
 				for (const post of posts) {
 					const postString = JSON.stringify(post)
@@ -231,13 +231,28 @@ class DatabaseDump {
 				}
 				case DatabaseDump.collectionTypes.acknowledgedPosts: {
 					const postCount = await streamReader.readUint32()
+					let posts = []
 					for (let i = 0; i < postCount; i++) {
 						const postString = await streamReader.readString()
 						const post = JSON.parse(postString)
-						await db.acknowledgedPosts.put(post)
+						posts.push(post)
 						stats.imported++
+						// Call bulkPut every 1000 entries
+						if (posts.length === 10000) {
+							await db.acknowledgedPosts.bulkPut(posts).catch((e) => {
+								console.error("Import error:", e)
+							})
+							posts = []
+							streamReader.trim()
+						}
 					}
-					streamReader.trim()
+					// Handle remaining posts
+					if (posts.length) {
+						await db.acknowledgedPosts.bulkPut(posts).catch((e) => {
+							console.error("Import error:", e)
+						})
+						streamReader.trim()
+					}
 					break
 				}
 				default:
