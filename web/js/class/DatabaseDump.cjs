@@ -202,6 +202,7 @@ class DatabaseDump {
 		}
 		// close file
 		await deflateStreamWriter.close()
+		alert("Export completed")
 	}
 	/**Imports the database from a dump.
 	 * @param {Dexie} db - The database to import into.
