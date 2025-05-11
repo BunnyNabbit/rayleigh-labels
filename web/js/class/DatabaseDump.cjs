@@ -1,3 +1,4 @@
+/** @typedef {import("dexie").Dexie} Dexie */
 /** Represents a growing buffer. */
 class GrowBuffer {
 	/**Creates a new GrowBuffer instance.
