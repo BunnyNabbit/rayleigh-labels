@@ -164,7 +164,7 @@ class DatabaseDump {
 		deflateStream.readable.pipeTo(writeStream)
 		const deflateStreamWriter = deflateStream.writable.getWriter()
 
-		{ // metadata TODO: use GrowBuffer
+		{ // metadata
 			await deflateStreamWriter.write(new Uint8Array([DatabaseDump.collectionTypes.metadata]))
 			const metadataString = JSON.stringify({
 				"version": 1,
@@ -173,12 +173,9 @@ class DatabaseDump {
 					"acknowledgedPosts"
 				]
 			})
-			// size
-			const metadataSizeArray = new Uint8Array(4)
-			const metadataSizeView = new DataView(metadataSizeArray.buffer)
-			metadataSizeView.setUint32(0, metadataString.length, true)
-			await deflateStreamWriter.write(metadataSizeArray)
-			await deflateStreamWriter.write(new TextEncoder().encode(metadataString))
+			const metadataBuffer = new GrowBuffer(128)
+			metadataBuffer.writeString(metadataString, true)
+			await deflateStreamWriter.write(metadataBuffer.toBuffer())
 		}
 		{ // acknowledgedPosts
 			await deflateStreamWriter.write(new Uint8Array([DatabaseDump.collectionTypes.acknowledgedPosts]))
