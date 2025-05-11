@@ -10,12 +10,17 @@ class GrowBuffer {
 		this.resizeIncrement = resizeIncrement
 		this.buffer = new Uint8Array(initialSize)
 	}
+	/**Resizes the buffer to the specified size.
+	 * @param {number} newSize - The new size of the buffer.
+	 */
 	resize(newSize) {
 		const newBuffer = new Uint8Array(newSize)
 		newBuffer.set(this.buffer.subarray(0, this.currentSize))
 		this.buffer = newBuffer
 	}
-	/** Trims bytes from beginning of buffer. */
+	/**Trims bytes from beginning of buffer.
+	 * @param {number} num - The number of bytes to trim.
+	 */
 	trim(num) {
 		const newBuffer = new Uint8Array((this.currentSize + this.resizeIncrement) - num)
 		const removed = this.buffer.subarray(0, num)
@@ -29,6 +34,9 @@ class GrowBuffer {
 		return removed
 
 	}
+	/**Writes bytes to the buffer.
+	 * @param {Uint8Array} bytes - The bytes to write.
+	 */
 	writeBytes(bytes) {
 		if (this.writeCursor + bytes.length >= this.buffer.length) {
 			this.resize(this.buffer.length + this.resizeIncrement + bytes.length)
@@ -37,6 +45,10 @@ class GrowBuffer {
 		this.writeCursor += bytes.length
 		this.currentSize += bytes.length
 	}
+	/**Writes a string to the buffer.
+	 * @param {string} string - The string to write.
+	 * @param {boolean} writeLength - Whether to write the length of the string first.
+	 */
 	writeString(string, writeLength) {
 		const encoder = new TextEncoder()
 		const bytes = encoder.encode(string)
@@ -45,6 +57,9 @@ class GrowBuffer {
 		}
 		this.writeBytes(bytes)
 	}
+	/**Writes a 32-bit unsigned integer to the buffer.
+	 * @param {number} value - The value to write.
+	 */
 	writeUint32(value) {
 		if (this.writeCursor + 4 >= this.buffer.length) {
 			this.resize(this.buffer.length + this.resizeIncrement + 4)
@@ -58,14 +73,18 @@ class GrowBuffer {
 		return this.buffer.subarray(0, this.currentSize)
 	}
 }
+/** Represents a stream reader that reads from a stream and buffers the data.*/
 class StreamReader extends GrowBuffer {
+	/**Creates a new StreamReader instance.
+	 * @param {ReadableStream} stream - The stream to read from.
+	 */
 	constructor(stream) {
 		super()
 		this.stream = stream
 		this.reader = stream.getReader()
 		this.bufferReadBytes = 0
 	}
-	/** Trims read bytes of internal buffer.. */
+	/** Trims read bytes of internal buffer. */
 	trim() {
 		const trimmed = super.trim(this.bufferReadBytes)
 		this.bufferReadBytes = 0
@@ -121,14 +140,20 @@ class StreamReader extends GrowBuffer {
 		await this.reader.cancel()
 	}
 }
-
+/**Namespace for database dump operations.
+ * @namespace DatabaseDump
+ */
 class DatabaseDump {
 	static collectionTypes = {
 		"eof": 0x00,
 		"acknowledgedPosts": 0x01,
 		"metadata": 0xff
 	}
-
+	/**Dumps the database to a file.
+	 * @param {Dexie} db - The database to export.
+	 * @param {FileSystemHandle} fileHandle - The file handle to write to.
+	 * @returns {Promise<void>} - A promise that resolves when the export is complete.
+	 */
 	static async export(db, fileHandle) {
 		const writeStream = await fileHandle.createWritable({
 			keepExistingData: false,
@@ -178,7 +203,13 @@ class DatabaseDump {
 		// close file
 		await deflateStreamWriter.close()
 	}
-
+	/**Imports the database from a dump.
+	 * @param {Dexie} db - The database to import into.
+	 * @param {FileSystemHandle} fileHandle - The file handle to read from.
+	 * @returns {Promise<void>} - A promise that resolves when the import is complete.
+	 * @throws {Error} - Throws an error if the collection type is unknown.
+	 * @throws {Error} - Throws an error if the import fails.
+	 */
 	static async import(db, fileHandle) {
 		const fileStream = await fileHandle.getFile().then(file => file.stream())
 		const deflateStream = new DecompressionStream("deflate")
