@@ -12,27 +12,27 @@
   "author": "BunnyNabbit",
   "license": "MIT",
   "devDependencies": {
-    "@eslint/js": "^9.22.0",
+    "@eslint/js": "^9.31.0",
     "autoprefixer": "^10.4.21",
     "css-loader": "^6.11.0",
-    "eslint": "^9.22.0",
+    "eslint": "^9.31.0",
     "globals": "^15.15.0",
     "html-webpack-plugin": "^5.6.3",
     "postcss-loader": "^8.1.1",
-    "sass": "^1.85.1",
+    "sass": "^1.89.2",
     "sass-loader": "^14.2.1",
     "style-loader": "^3.3.4",
-    "webpack": "^5.98.0",
+    "webpack": "^5.100.2",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.1"
+    "webpack-dev-server": "^5.2.2"
   },
   "dependencies": {
     "@atproto/api": "^0.13.35",
-    "@atproto/oauth-client-browser": "^0.3.11",
+    "@atproto/oauth-client-browser": "^0.3.27",
     "dexie": "^4.0.11",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.6.1",
     "events": "^3.3.0",
     "express": "^4.21.2",
-    "hls.js": "^1.5.20"
+    "hls.js": "^1.6.7"
   }
 }
