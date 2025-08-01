@@ -12,10 +12,10 @@
   "author": "BunnyNabbit",
   "license": "MIT",
   "devDependencies": {
-    "@eslint/js": "^9.31.0",
+    "@eslint/js": "^9.32.0",
     "autoprefixer": "^10.4.21",
     "css-loader": "^6.11.0",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "globals": "^15.15.0",
     "html-webpack-plugin": "^5.6.3",
     "postcss-loader": "^8.1.1",
