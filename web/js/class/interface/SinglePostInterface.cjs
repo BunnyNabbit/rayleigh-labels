@@ -96,6 +96,13 @@ class SinglePostInterface extends GenericInterface {
 				video.alt = media.alt
 			}
 			this.currentVideoSubjectElement = video
+			const timeIncrement = this.configurationModal.getSetting("videoSeekSeconds") // seconds
+			if (direction == InputControls.DIRECTION.RIGHT) { // seek video
+				video.currentTime = Math.min(video.currentTime + timeIncrement, video.duration)
+			} else if (direction == InputControls.DIRECTION.LEFT) {
+				video.currentTime = Math.max(video.currentTime - timeIncrement, 0)
+			}
+
 		} else {
 			if (!media.elementCache) this.preloadMedia(media)
 			const image = media.elementCache

@@ -327,6 +327,7 @@ class ConfigurationModal extends BaseMenuModal {
 		this.addSetting(new NumberRangeSetting("maxDisplayedVideos", "Max videos to display at once", 2, 1, 64))
 		this.addSetting(new BooleanSetting("autoplay", "Autoplay videos", true))
 		this.addSetting(new BooleanSetting("unmuteVideos", "Unmute videos", false))
+		this.addSetting(new NumberRangeSetting("videoSeekSeconds", "Video seek increment in seconds", 3, 0, 60))
 		this.addSetting(new TextSetting("blurLabels", "Blur labels (Comma separated)", "!hide,!warn"))
 		this.addSetting(new TextSetting("priorityTags", "Prioritize post subject tags (Comma separated)", "priority"))
 		this.addSetting(new NumberRangeSetting("gridX", "Escalation grid X", 3, 1, 8))
