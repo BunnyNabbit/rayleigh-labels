@@ -88,7 +88,7 @@ class SinglePostInterface extends GenericInterface {
 			media.elementCache.classList.add("fullscreen-image")
 			const video = media.elementCache
 			video.classList.remove("hidden")
-			video.play()
+			if (video.paused) video.play()
 			video.playbackRate = 2
 			video.controls = true
 			if (media.alt) {
