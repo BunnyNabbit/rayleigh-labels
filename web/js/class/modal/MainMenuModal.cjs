@@ -3,6 +3,7 @@ const ClientAPI = require("../../class/API.cjs")
 const PostQueue = require("../../class/PostQueue.cjs")
 const QueueQuestionModal = require("./PopulatorQuestionModal.cjs")
 class MainMenuModal extends BaseMenuModal {
+	/** */
 	constructor(toyNoises) {
 		super(true, toyNoises)
 	}

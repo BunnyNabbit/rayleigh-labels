@@ -3,6 +3,7 @@ const DatabaseDump = require("../DatabaseDump.cjs")
 const db = require("../../db.cjs")
 
 class MaintenanceModal extends BaseMenuModal {
+	/** */
 	constructor(toyNoises) {
 		super(false, toyNoises)
 		this.addCloseButton()
@@ -63,8 +64,8 @@ class MaintenanceModal extends BaseMenuModal {
 	static generateFilenameDate(name) {
 		const date = new Date()
 		const year = date.getFullYear()
-		const month = String(date.getMonth() + 1).padStart(2, '0')
-		const day = String(date.getDate()).padStart(2, '0')
+		const month = String(date.getMonth() + 1).padStart(2, "0")
+		const day = String(date.getDate()).padStart(2, "0")
 		return `${name}-${year}-${month}-${day}.json`
 	}
 
@@ -72,12 +73,14 @@ class MaintenanceModal extends BaseMenuModal {
 		multiple: false,
 		id: "dump",
 		startIn: "downloads",
-		types: [{
-			description: "Database dump",
-			accept: {
-				"application/octet-stream": [".rayleighdump"],
-			}
-		}]
+		types: [
+			{
+				description: "Database dump",
+				accept: {
+					"application/octet-stream": [".rayleighdump"],
+				},
+			},
+		],
 	}
 	static localStoragePrefix = "rayleigh"
 }

@@ -5,6 +5,7 @@ const ToyNoises = require("../sound/ToyNoises.cjs")
 
 // Displays media from posts in a grid. Click to escalate a post, removing it from queue and view.
 class MultiplePostEscalateInterface extends GenericInterface {
+	/** */
 	constructor(postQueue, toyNoises) {
 		super(postQueue, toyNoises, true)
 		this.overflowPost = null
@@ -26,14 +27,16 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		this.container.appendChild(this.postContainer)
 		this.labelValues = new Set()
 		const labels = this.postQueue.getLabels()
-		labels.forEach(label => {
+		labels.forEach((label) => {
 			this.labelValues.add(label.slug)
 		})
 	}
+
 	updatePositionIndicator() {
 		const text = `${this.postQueue.queue.length}`
 		this.positionIndicatorElement.innerText = text
 	}
+
 	open() {
 		this.gridX = parseInt(this.configurationModal.getSetting("gridX"))
 		this.gridY = parseInt(this.configurationModal.getSetting("gridY"))
@@ -47,7 +50,9 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			}, 1000)
 		})
 	}
-	previous() { // Gets posts from backQueue and displays them
+
+	previous() {
+		// Gets posts from backQueue and displays them
 		if (!this.postQueue.backQueue.length) return
 		// move current posts to queue
 		this.postQueue.queue.unshift(...this.currentPosts)
@@ -60,17 +65,18 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				remove.push(post)
 			}
 		}
-		remove.forEach(post => {
+		remove.forEach((post) => {
 			this.postQueue.backQueue.splice(this.postQueue.backQueue.indexOf(post), 1)
 		})
 		this.updatePositionIndicator()
 	}
-	next() { // Gets posts from queue and displays them
+	/**Gets posts from queue and displays them */
+	next() {
 		if (this.postQueue.queue[0]) {
 			this.postQueue.backQueue.unshift(...this.currentPosts) // add current posts to back queue
 			// acknowledge current posts which have not been escalated
-			this.currentPosts.forEach(post => {
-				if (!post.escalated && !post.acknowledged && !post.renderImages.some(media => media.loaded == false)) {
+			this.currentPosts.forEach((post) => {
+				if (!post.escalated && !post.acknowledged && !post.renderImages.some((media) => media.loaded == false)) {
 					this.postQueue.labelPost(post, [], [])
 					this.postQueue.dbAcknowledgePost(post, false)
 					post.acknowledged = true
@@ -82,8 +88,8 @@ class MultiplePostEscalateInterface extends GenericInterface {
 			const backQueueLimit = parseInt(this.configurationModal.getSetting("backQueueLimit"))
 			if (this.postQueue.backQueue.length > backQueueLimit) {
 				const removed = this.postQueue.backQueue.splice(backQueueLimit)
-				removed.forEach(removedPost => {
-					removedPost.renderImages.forEach(media => {
+				removed.forEach((removedPost) => {
+					removedPost.renderImages.forEach((media) => {
 						if (media.elementCache) {
 							media.elementCache.remove()
 							// Destroy HLS context
@@ -101,7 +107,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					remove.push(post)
 				}
 			}
-			remove.forEach(post => {
+			remove.forEach((post) => {
 				this.postQueue.queue.splice(this.postQueue.queue.indexOf(post), 1)
 			})
 		} else {
@@ -110,10 +116,13 @@ class MultiplePostEscalateInterface extends GenericInterface {
 		}
 		this.updatePositionIndicator()
 	}
-	displaySet() { // Displays posts from queue
+
+	displaySet() {
+		// Displays posts from queue
 		this.displayPosts(this.postQueue.queue)
 		this.updatePositionIndicator()
 	}
+
 	displayPosts(set) {
 		// clear container
 		this.postContainer.innerHTML = ""
@@ -133,7 +142,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				return
 			}
 			// attempt to fill wizh media
-			media.forEach(media => {
+			media.forEach((media) => {
 				// check if overflowing
 				if (index >= this.setCount) {
 					this.overflowPost = post
@@ -152,7 +161,7 @@ class MultiplePostEscalateInterface extends GenericInterface {
 				element.classList.add("grid-item")
 				element.style.gridColumn = x + 1
 				element.style.gridRow = y + 1
-				post.labels.forEach(label => {
+				post.labels.forEach((label) => {
 					if (this.labelValues.has(label.val)) {
 						// highlight element
 						element.style.borderColor = "red"
@@ -162,7 +171,8 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					}
 				})
 				postMediaMap.set(element, post)
-				if (media.playlist) { // video
+				if (media.playlist) {
+					// video
 					if (!media.elementCache) this.preloadMedia(media)
 					const video = media.elementCache
 					video.classList.remove("hidden")
@@ -180,7 +190,8 @@ class MultiplePostEscalateInterface extends GenericInterface {
 					video.style.width = "100%"
 					video.style.height = "100%"
 					element.appendChild(video)
-				} else if (media.fullsize) { // image
+				} else if (media.fullsize) {
+					// image
 					if (!media.elementCache) this.preloadMedia(media)
 					const image = media.elementCache
 					image.classList.remove("hidden")

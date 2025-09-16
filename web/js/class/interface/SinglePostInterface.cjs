@@ -3,6 +3,7 @@ const InputControls = require("../InputControls.cjs")
 const GenericInterface = require("./GenericInterface.cjs")
 
 class SinglePostInterface extends GenericInterface {
+	/** */
 	constructor(postQueue, toyNoises) {
 		super(postQueue, toyNoises, true)
 		this.postQueue = postQueue
@@ -17,12 +18,12 @@ class SinglePostInterface extends GenericInterface {
 		const labels = this.postQueue.getLabels()
 		this.currentLabelsElement = document.getElementById("currentLabels")
 		this.currentLabelsElement.innerHTML = ""
-		labels.forEach(label => {
-			const inputElement = document.createElement('input')
-			inputElement.type = 'checkbox'
+		labels.forEach((label) => {
+			const inputElement = document.createElement("input")
+			inputElement.type = "checkbox"
 			inputElement.id = label.slug
 
-			const labelElement = document.createElement('label')
+			const labelElement = document.createElement("label")
 			labelElement.htmlFor = label.slug
 			labelElement.textContent = label.readableName
 			labelElement.style.backgroundColor = label.backgroundColor
@@ -53,6 +54,7 @@ class SinglePostInterface extends GenericInterface {
 			this.previous()
 		})
 	}
+
 	displayPost(post) {
 		this.viewedAll = false
 		this.currentPost = post
@@ -60,10 +62,12 @@ class SinglePostInterface extends GenericInterface {
 		this.switchPostImage()
 		this.updateLabels(post)
 	}
+
 	updatePositionIndicator(post) {
 		const text = `${this.currentPosition + 1}/${post.renderImages.length} - ${this.postQueue.queue.length}`
 		this.positionIndicatorElement.innerText = text
 	}
+
 	switchPostImage(direction = InputControls.DIRECTION.STILL) {
 		if (!this.currentPost) return
 		const max = this.currentPost.renderImages.length - 1
@@ -97,12 +101,12 @@ class SinglePostInterface extends GenericInterface {
 			}
 			this.currentVideoSubjectElement = video
 			const timeIncrement = this.configurationModal.getSetting("videoSeekSeconds") // seconds
-			if (direction == InputControls.DIRECTION.RIGHT) { // seek video
+			if (direction == InputControls.DIRECTION.RIGHT) {
+				// seek video
 				video.currentTime = Math.min(video.currentTime + timeIncrement, video.duration)
 			} else if (direction == InputControls.DIRECTION.LEFT) {
 				video.currentTime = Math.max(video.currentTime - timeIncrement, 0)
 			}
-
 		} else {
 			if (!media.elementCache) this.preloadMedia(media)
 			const image = media.elementCache
@@ -115,13 +119,14 @@ class SinglePostInterface extends GenericInterface {
 
 		this.updatePositionIndicator(this.currentPost)
 	}
+
 	updateLabels(post) {
-		this.labelElements.forEach(labelElement => {
+		this.labelElements.forEach((labelElement) => {
 			labelElement.checked = false
 		})
 		let hasLabel = false
-		post.labels.forEach(label => {
-			const labelElement = this.labelElements.find(element => element.id == label.val)
+		post.labels.forEach((label) => {
+			const labelElement = this.labelElements.find((element) => element.id == label.val)
 			if (labelElement) {
 				labelElement.checked = true
 				hasLabel = true
@@ -129,25 +134,30 @@ class SinglePostInterface extends GenericInterface {
 		})
 		if (hasLabel) this.toyNoises.playSound(ToyNoises.sounds.hasLabel)
 	}
+
 	open() {
 		document.getElementById("singlePostInterface").classList.remove("hidden")
 		this.postQueue.getSet()
 	}
-	previous() { // Gets one post from backQueue and displays it
+
+	previous() {
+		// Gets one post from backQueue and displays it
 		if (!this.currentPost) return
 		if (!this.postQueue.backQueue.length) return
 		const post = this.postQueue.backQueue.pop()
 		this.postQueue.queue.unshift(post)
 		this.displayPost(post)
 	}
-	next() { // Gets one post from queue and displays it
+
+	next() {
+		// Gets one post from queue and displays it
 		if (!this.currentPost) return
 		if (!this.viewedAll) return this.switchPostImage(InputControls.DIRECTION.RIGHT)
 		const post = this.postQueue.queue.shift()
 		this.postQueue.backQueue.push(post)
 		if (this.postQueue.backQueue.length > parseInt(this.configurationModal.getSetting("backQueueLimit"))) {
 			const removedPost = this.postQueue.backQueue.shift()
-			removedPost.renderImages.forEach(media => {
+			removedPost.renderImages.forEach((media) => {
 				if (media.elementCache) {
 					media.elementCache.remove()
 					// Destroy HLS context
@@ -158,11 +168,17 @@ class SinglePostInterface extends GenericInterface {
 			})
 		}
 		const postLabels = this.currentPost.labels
-		const currentLabelValues = this.labelElements.map(element => { return { name: element.id, checked: element.checked } })
-		const add = currentLabelValues.filter(currentValue => currentValue.checked == true && !postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
-		const negate = currentLabelValues.filter(currentValue => currentValue.checked == false && postLabels.some(postLabel => postLabel.val == currentValue.name)).map(label => label.name)
+		const currentLabelValues = this.labelElements.map((element) => {
+			return { name: element.id, checked: element.checked }
+		})
+		const add = currentLabelValues.filter((currentValue) => currentValue.checked == true && !postLabels.some((postLabel) => postLabel.val == currentValue.name)).map((label) => label.name)
+		const negate = currentLabelValues.filter((currentValue) => currentValue.checked == false && postLabels.some((postLabel) => postLabel.val == currentValue.name)).map((label) => label.name)
 		this.postQueue.labelPost(post, add, negate)
-		this.currentPost.labels = this.labelElements.filter(element => element.checked == true).map(element => { return { val: element.id } })
+		this.currentPost.labels = this.labelElements
+			.filter((element) => element.checked == true)
+			.map((element) => {
+				return { val: element.id }
+			})
 		if (this.postQueue.queue[0]) {
 			this.displayPost(this.postQueue.queue[0])
 			this.preloadNextPosts()
@@ -171,7 +187,9 @@ class SinglePostInterface extends GenericInterface {
 			this.postQueue.getSet()
 		}
 	}
-	displaySet() { // Displays the current post in queue
+
+	displaySet() {
+		// Displays the current post in queue
 		this.displayPost(this.postQueue.queue[0])
 	}
 }

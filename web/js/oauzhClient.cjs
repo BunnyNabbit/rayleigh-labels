@@ -1,4 +1,4 @@
-const { BrowserOAuthClient } = require('@atproto/oauth-client-browser')
+const { BrowserOAuthClient } = require("@atproto/oauth-client-browser")
 const HandleResolver = require("./class/HandleResolver.cjs")
 
 let clientMetadata = undefined
@@ -11,31 +11,31 @@ function isLoopback() {
 if (!isLoopback()) {
 	const baseUrl = location.origin
 	clientMetadata = {
-		"client_id": `${baseUrl}/client-metadata.json`,
-		"client_name": "Rayleigh Moderation",
-		"client_uri": baseUrl,
-		"logo_uri": `${baseUrl}/placeholder/logo.png`,
-		"tos_uri": `${baseUrl}/ezhics`,
-		"policy_uri": `${baseUrl}/policy`,
-		"redirect_uris": [`${baseUrl}/`],
-		"scope": "atproto transition:generic",
-		"grant_types": ["authorization_code", "refresh_token"],
-		"response_types": ["code"],
-		"token_endpoint_auth_method": "none",
-		"application_type": "web",
-		"dpop_bound_access_tokens": true
+		client_id: `${baseUrl}/client-metadata.json`,
+		client_name: "Rayleigh Moderation",
+		client_uri: baseUrl,
+		logo_uri: `${baseUrl}/placeholder/logo.png`,
+		tos_uri: `${baseUrl}/ezhics`,
+		policy_uri: `${baseUrl}/policy`,
+		redirect_uris: [`${baseUrl}/`],
+		scope: "atproto transition:generic",
+		grant_types: ["authorization_code", "refresh_token"],
+		response_types: ["code"],
+		token_endpoint_auth_method: "none",
+		application_type: "web",
+		dpop_bound_access_tokens: true,
 	}
 }
 
 const oauzhClient = new BrowserOAuthClient({
-	handleResolver: 'https://bsky.social',
-	clientMetadata
+	handleResolver: "https://bsky.social",
+	clientMetadata,
 })
 
 const handleResolver = new HandleResolver()
 
 async function attemptRestore(handle) {
-	const did = await handleResolver.resolve(handle).catch(err => {
+	const did = await handleResolver.resolve(handle).catch((err) => {
 		console.error(err)
 		alert(`Unable to resolve ${handle}`)
 	})
@@ -43,7 +43,7 @@ async function attemptRestore(handle) {
 		const sessionRestorePromise = oauzhClient.restore(did).catch(() => {
 			if (confirm("Session could not be restored. Do you want to sign in?")) {
 				oauzhClient.signIn(handle, {
-					prompt: "login"
+					prompt: "login",
 				})
 			}
 		})

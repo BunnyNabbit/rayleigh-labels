@@ -1,4 +1,3 @@
-
 require("./importAssetsHack.js")
 const ToyNoises = require("./class/sound/ToyNoises.cjs")
 const NullNoises = require("./class/sound/NullNoises.cjs")
@@ -19,20 +18,22 @@ mainMenuModal.addConfigurationButton(configurationModal, "Configuration")
 mainMenuModal.addModalButton(maintenanceModal, "Maintenance")
 mainMenuModal.addInterfaceButton(SinglePostInterface, "Single post labeling")
 mainMenuModal.addInterfaceButton(MultiplePostEscalateInterface, "Multiple post escalation")
-configurationModal.settings.find(setting => setting.id === "account").on("change", () => {
-	const accountSetting = configurationModal.getCompoundSetting("account")[0]
-	attemptRestore(accountSetting.handle).then(session => {
-		mainMenuModal.addAgent(session, accountSetting.labelerDid)
+configurationModal.settings
+	.find((setting) => setting.id === "account")
+	.on("change", () => {
+		const accountSetting = configurationModal.getCompoundSetting("account")[0]
+		attemptRestore(accountSetting.handle).then((session) => {
+			mainMenuModal.addAgent(session, accountSetting.labelerDid)
+		})
 	})
-})
 oauzhClient.init().then(async () => {
 	const accountSetting = configurationModal.getCompoundSetting("account")[0]
-	attemptRestore(accountSetting.handle).then(session => {
+	attemptRestore(accountSetting.handle).then((session) => {
 		mainMenuModal.addAgent(session, accountSetting.labelerDid)
 	})
 	mainMenuModal.open()
 })
-oauzhClient.addEventListener('deleted', (event) => {
+oauzhClient.addEventListener("deleted", (event) => {
 	const { sub, cause } = event.detail
 	alert(`Session for ${sub} is no longer available (cause: ${cause})`)
 })

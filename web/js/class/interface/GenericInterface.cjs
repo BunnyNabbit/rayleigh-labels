@@ -1,6 +1,7 @@
 const Hls = require("hls.js")
 
 class GenericInterface {
+	/** */
 	constructor(postQueue, toyNoises, disableLabels) {
 		this.postQueue = postQueue
 		this.configurationModal = postQueue.configurationModal
@@ -17,22 +18,24 @@ class GenericInterface {
 			this.addLabelElements()
 		}
 	}
+
 	addPositionIndicator() {
 		this.positionIndicatorElement = document.createElement("div")
 		this.positionIndicatorElement.classList.add("position-indicator")
 		this.positionIndicatorElement.classList.add("font")
 		this.container.appendChild(this.positionIndicatorElement)
 	}
+
 	addLabelElements() {
 		this.labelElements = []
 		const labels = this.postQueue.getLabels()
 		this.currentLabelsElement.innerHTML = ""
-		labels.forEach(label => {
-			const inputElement = document.createElement('input')
-			inputElement.type = 'checkbox'
+		labels.forEach((label) => {
+			const inputElement = document.createElement("input")
+			inputElement.type = "checkbox"
 			inputElement.id = label.slug
 
-			const labelElement = document.createElement('label')
+			const labelElement = document.createElement("label")
 			labelElement.htmlFor = label.slug
 			labelElement.textContent = label.readableName
 			labelElement.style.backgroundColor = label.backgroundColor
@@ -49,6 +52,7 @@ class GenericInterface {
 			this.labelElements.push(inputElement)
 		})
 	}
+
 	preloadNextPosts() {
 		// preload next posts
 		let imagesPreloaded = 0
@@ -63,7 +67,7 @@ class GenericInterface {
 					continue
 				}
 				post.preloaded = true
-				post.renderImages.forEach(media => {
+				post.renderImages.forEach((media) => {
 					this.preloadMedia(media)
 				})
 			}
@@ -81,12 +85,13 @@ class GenericInterface {
 					continue
 				}
 				post.preloaded = true
-				post.renderImages.forEach(media => {
+				post.renderImages.forEach((media) => {
 					this.preloadMedia(media)
 				})
 			}
 		}
 	}
+
 	preloadMedia(media) {
 		media.loaded = false
 		if (media.fullsize) {
@@ -119,6 +124,7 @@ class GenericInterface {
 		}
 		return media
 	}
+
 	close() {
 		this.container.remove()
 	}

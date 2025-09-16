@@ -4,9 +4,11 @@ const { chunkArray } = require("../../utils.cjs")
 const API = require("../API.cjs")
 
 class SearchPopulator extends BaseQueuePopulator {
+	/** */
 	constructor(postQueue) {
 		super(postQueue)
 	}
+
 	async populate() {
 		super.populate()
 		const queueType = this.postQueue.configurationModal.getSetting("queue")
@@ -17,8 +19,8 @@ class SearchPopulator extends BaseQueuePopulator {
 		const reportScore = this.postQueue.configurationModal.getSetting("reportCountScore")
 		const likeScore = this.postQueue.configurationModal.getSetting("likeScore")
 		const tagList = this.postQueue.configurationModal.getSetting("priorityTags").split(",")
-		response.forEach(report => {
-			report.tags.forEach(tag => {
+		response.forEach((report) => {
+			report.tags.forEach((tag) => {
 				if (tagList.includes(tag)) {
 					tagUriCache.add(report.subject.uri)
 				}
@@ -28,18 +30,18 @@ class SearchPopulator extends BaseQueuePopulator {
 			}
 		})
 		let reportQueue = []
-		const uris = response.map(report => report.subject.uri).filter(element => element)
+		const uris = response.map((report) => report.subject.uri).filter((element) => element)
 		const promises = []
-		chunkArray(uris, API.bulkHydrateLimit).forEach(postChunk => {
+		chunkArray(uris, API.bulkHydrateLimit).forEach((postChunk) => {
 			const hydratePromise = this.postQueue.api.hydratePosts(postChunk)
 			promises.push(hydratePromise)
-			hydratePromise.then(response => {
+			hydratePromise.then((response) => {
 				const posts = response.posts
 				const filteredPosts = PostQueue.filterTransformEmbedTypes(posts)
-				const missingUris = postChunk.filter(uri => !posts.some(post => post.uri == uri))
-				reportQueue = reportQueue.concat(missingUris.filter(uri => uri.includes("/app.bsky.feed.post/")))
+				const missingUris = postChunk.filter((uri) => !posts.some((post) => post.uri == uri))
+				reportQueue = reportQueue.concat(missingUris.filter((uri) => uri.includes("/app.bsky.feed.post/")))
 				console.log({ missingUris: reportQueue.join(",") })
-				filteredPosts.forEach(post => {
+				filteredPosts.forEach((post) => {
 					post.tagged = tagUriCache.has(post.uri)
 					this.postQueue.queue.push(post)
 					this.emit("post", post)
@@ -47,7 +49,7 @@ class SearchPopulator extends BaseQueuePopulator {
 			})
 		})
 		await Promise.allSettled(promises)
-		this.postQueue.queue.forEach(post => {
+		this.postQueue.queue.forEach((post) => {
 			let score = post.likeCount * likeScore
 			const recordStats = recordStatCache.get(post.uri)
 			if (recordStats) {
@@ -56,13 +58,15 @@ class SearchPopulator extends BaseQueuePopulator {
 			}
 			post.score = score
 		})
-		this.postQueue.queue = this.postQueue.queue.sort((a, b) => a.renderImages.length - b.renderImages.length)
-			.sort((a, b) => (b.score) - (a.score))
+		this.postQueue.queue = this.postQueue.queue
+			.sort((a, b) => a.renderImages.length - b.renderImages.length)
+			.sort((a, b) => b.score - a.score)
 			.sort((a, b) => b.tagged - a.tagged)
 		this.running = false
 	}
+
 	static sleep(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms))
+		return new Promise((resolve) => setTimeout(resolve, ms))
 	}
 	static searchDelay = 5000
 }

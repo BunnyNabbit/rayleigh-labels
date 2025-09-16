@@ -9,7 +9,9 @@ class ToyNoises {
 	 */
 	constructor() {
 		this.sfxrGenerationDegradation = 0
-		this.interval = setInterval(() => { this.sfxrGenerationDegradation = 1 }, 300)
+		this.interval = setInterval(() => {
+			this.sfxrGenerationDegradation = 1
+		}, 300)
 	}
 
 	/**
@@ -42,7 +44,7 @@ class ToyNoises {
 		addLabel: "34T6PktTUDAmJbCDoG4ZpNfWdzxkh2X7RQJBpEtRydQ6V21jpTtsGMGu4qDVioCHUeayPmzGf2HVzxQkUZkg5wpjHFJAWahbhYfaq9DefuN7uRYXsKmbcNWrT",
 		removeLabel: "34T6PktTUDAmJbCDoG4ZpNf1dUxfN4tkxPxnYkKQZWzNxssWrEzepcSwfgvdcdKmxF1a2EnN5C5RHHCviY45PniXkeZJTFbLfuZe8f4ohaAfVyoEpk5deUYEj",
 		videoLoad: "57uBnWWjHLipzPva3aWuvVAKjtNZVqPXK1rgnULF75gk39WvWUNqpZbnQmQj3NPQwkcUQ6VQkHGpYb4s6vJvXNX27gzA9ibekarmFqKXYQfmhKQuffiEidF35",
-		escalate: "1tGxwj1Ux1oBiUN2ozTJbitsKwH3yJX1V1Z95h95vzveEXxfRFCfJBHHwMWrqpXTFJeQBQAtMpWrcHTCihE4swyktynWq8WxdWkf7NosCSyHyPzCNCLDWYXzq"
+		escalate: "1tGxwj1Ux1oBiUN2ozTJbitsKwH3yJX1V1Z95h95vzveEXxfRFCfJBHHwMWrqpXTFJeQBQAtMpWrcHTCihE4swyktynWq8WxdWkf7NosCSyHyPzCNCLDWYXzq",
 	}
 }
 

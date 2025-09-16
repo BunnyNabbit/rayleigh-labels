@@ -23,7 +23,7 @@ class GrowBuffer {
 	 * @param {number} num - The number of bytes to trim.
 	 */
 	trim(num) {
-		const newBuffer = new Uint8Array((this.currentSize + this.resizeIncrement) - num)
+		const newBuffer = new Uint8Array(this.currentSize + this.resizeIncrement - num)
 		const removed = this.buffer.subarray(0, num)
 		newBuffer.set(this.buffer.subarray(num, this.currentSize), 0)
 		this.buffer = newBuffer
@@ -33,7 +33,6 @@ class GrowBuffer {
 			throw new Error("Write cursor is negative")
 		}
 		return removed
-
 	}
 	/**Writes bytes to the buffer.
 	 * @param {Uint8Array} bytes - The bytes to write.
@@ -70,6 +69,7 @@ class GrowBuffer {
 		this.writeCursor += 4
 		this.currentSize += 4
 	}
+
 	toBuffer() {
 		return this.buffer.subarray(0, this.currentSize)
 	}
@@ -91,6 +91,7 @@ class StreamReader extends GrowBuffer {
 		this.bufferReadBytes = 0
 		return trimmed
 	}
+
 	async read(chunkSize = 1024) {
 		while (this.remainingBufferedBytes < chunkSize) {
 			const { done, value } = await this.reader.read()
@@ -100,6 +101,7 @@ class StreamReader extends GrowBuffer {
 			this.writeBytes(value)
 		}
 	}
+
 	async readBytes(num) {
 		if (this.remainingBufferedBytes < num) {
 			await this.read(num)
@@ -108,6 +110,7 @@ class StreamReader extends GrowBuffer {
 		this.bufferReadBytes += num
 		return bytes
 	}
+
 	async readUint32() {
 		if (this.remainingBufferedBytes < 4) {
 			await this.read(4)
@@ -117,6 +120,7 @@ class StreamReader extends GrowBuffer {
 		this.bufferReadBytes += 4
 		return value
 	}
+
 	async readString(length = false) {
 		if (length) {
 			if (this.remainingBufferedBytes < length) {
@@ -134,9 +138,11 @@ class StreamReader extends GrowBuffer {
 			return string
 		}
 	}
+
 	get remainingBufferedBytes() {
 		return this.currentSize - this.bufferReadBytes
 	}
+
 	async close() {
 		await this.reader.cancel()
 	}
@@ -146,9 +152,9 @@ class StreamReader extends GrowBuffer {
  */
 class DatabaseDump {
 	static collectionTypes = {
-		"eof": 0x00,
-		"acknowledgedPosts": 0x01,
-		"metadata": 0xff
+		eof: 0x00,
+		acknowledgedPosts: 0x01,
+		metadata: 0xff,
 	}
 	/**Dumps the database to a file.
 	 * @param {Dexie} db - The database to export.
@@ -158,26 +164,26 @@ class DatabaseDump {
 	static async export(db, fileHandle) {
 		const writeStream = await fileHandle.createWritable({
 			keepExistingData: false,
-			mode: "exclusive"
+			mode: "exclusive",
 		})
 		const deflateStream = new CompressionStream("deflate")
 		deflateStream.readable.pipeTo(writeStream)
 		const deflateStreamWriter = deflateStream.writable.getWriter()
 
-		{ // metadata
+		{
+			// metadata
 			await deflateStreamWriter.write(new Uint8Array([DatabaseDump.collectionTypes.metadata]))
 			const metadataString = JSON.stringify({
-				"version": 1,
-				"timestamp": Date.now(),
-				"tables": [
-					"acknowledgedPosts"
-				]
+				version: 1,
+				timestamp: Date.now(),
+				tables: ["acknowledgedPosts"],
 			})
 			const metadataBuffer = new GrowBuffer(128)
 			metadataBuffer.writeString(metadataString, true)
 			await deflateStreamWriter.write(metadataBuffer.toBuffer())
 		}
-		{ // acknowledgedPosts
+		{
+			// acknowledgedPosts
 			await deflateStreamWriter.write(new Uint8Array([DatabaseDump.collectionTypes.acknowledgedPosts]))
 			// post count
 			const postCount = await db.acknowledgedPosts.count()
@@ -195,7 +201,8 @@ class DatabaseDump {
 				await deflateStreamWriter.write(postsBuffer.toBuffer())
 			}
 		}
-		{ // eof
+		{
+			// eof
 			await deflateStreamWriter.write(new Uint8Array([DatabaseDump.collectionTypes.eof]))
 		}
 		// close file
@@ -210,12 +217,12 @@ class DatabaseDump {
 	 * @throws {Error} - Throws an error if the import fails.
 	 */
 	static async import(db, fileHandle) {
-		const fileStream = await fileHandle.getFile().then(file => file.stream())
+		const fileStream = await fileHandle.getFile().then((file) => file.stream())
 		const deflateStream = new DecompressionStream("deflate")
 		fileStream.pipeThrough(deflateStream)
 		const streamReader = new StreamReader(deflateStream.readable)
 		const stats = {
-			imported: 0
+			imported: 0,
 		}
 		let collectionType = (await streamReader.readBytes(1))[0]
 		while (collectionType != DatabaseDump.collectionTypes.eof) {

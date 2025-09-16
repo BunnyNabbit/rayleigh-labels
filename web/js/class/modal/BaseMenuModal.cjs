@@ -15,7 +15,7 @@ class BaseMenuModal extends EventEmitter {
 		this.modal = document.createElement("dialog")
 		document.body.appendChild(this.modal)
 		if (preventDialogClose) {
-			this.modal.addEventListener('keydown', (event) => {
+			this.modal.addEventListener("keydown", (event) => {
 				if (event.key === "Escape") {
 					event.preventDefault()
 					this.toyNoises.playSound(ToyNoises.sounds.lastInPost)
@@ -35,12 +35,12 @@ class BaseMenuModal extends EventEmitter {
 	}
 
 	addButton(text, func) {
-      const button = document.createElement("button")
-      button.textContent = text
-      button.onclick = func
-      this.modal.appendChild(button)
-      return button
-   }
+		const button = document.createElement("button")
+		button.textContent = text
+		button.onclick = func
+		this.modal.appendChild(button)
+		return button
+	}
 
 	open() {
 		this.modal.showModal()

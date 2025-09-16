@@ -5,7 +5,7 @@ function randomIntFromInterval(min, max) {
 function chunkArray(array, number) {
 	const chunks = []
 	let chunk = []
-	array.forEach(element => {
+	array.forEach((element) => {
 		chunk.push(element)
 		if (chunk.length == number) {
 			chunks.push(chunk)
@@ -18,5 +18,5 @@ function chunkArray(array, number) {
 
 module.exports = {
 	randomIntFromInterval,
-	chunkArray
+	chunkArray,
 }

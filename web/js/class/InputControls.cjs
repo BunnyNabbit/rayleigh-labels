@@ -1,21 +1,14 @@
 const EventEmitter = require("events")
 
 class InputControls extends EventEmitter {
+	/** */
 	constructor() {
 		super()
 		document.addEventListener("keydown", (event) => {
-			if (event.key == "ArrowLeft") {
-				this.emit("switchPostImage", InputControls.DIRECTION.LEFT)
-			}
-			if (event.key == "ArrowRight") {
-				this.emit("switchPostImage", InputControls.DIRECTION.RIGHT)
-			}
-			if (event.key == "Enter") {
-				this.emit("next")
-			}
-			if (event.key == "Backspace") {
-				this.emit("previous")
-			}
+			if (event.key == "ArrowLeft") this.emit("switchPostImage", InputControls.DIRECTION.LEFT)
+			if (event.key == "ArrowRight") this.emit("switchPostImage", InputControls.DIRECTION.RIGHT)
+			if (event.key == "Enter") this.emit("next")
+			if (event.key == "Backspace") this.emit("previous")
 		})
 		let touchStartX = null
 		let touchStartY = null
@@ -52,7 +45,7 @@ class InputControls extends EventEmitter {
 	static DIRECTION = {
 		LEFT: -1,
 		RIGHT: 1,
-		STILL: 0
+		STILL: 0,
 	}
 }
 module.exports = InputControls

@@ -1,9 +1,9 @@
-const { Agent } = require('@atproto/api')
-const EventQueue = require('./EventQueue.cjs')
+const { Agent } = require("@atproto/api")
+const EventQueue = require("./EventQueue.cjs")
 
 class ClientAPI {
 	/**
-	 * @param {Agent} agent  
+	 * @param {Agent} agent
 	 * @param {string} labelerDid
 	 */
 	constructor(agent, labelerDid) {
@@ -12,6 +12,7 @@ class ClientAPI {
 		this.agent.addLabeler(labelerDid)
 		this.eventQueue = new EventQueue()
 	}
+
 	async hydratePosts(uris) {
 		for (let i = 0; i <= ClientAPI.maxRetries; i++) {
 			try {
@@ -22,27 +23,29 @@ class ClientAPI {
 					throw error
 				} else {
 					console.warn(`Attempt ${i + 1} failed, retrying...`)
-					await new Promise(resolve => setTimeout(resolve, 1000))
+					await new Promise((resolve) => setTimeout(resolve, 1000))
 				}
 			}
 		}
 	}
+
 	queryStatuses(cursor, queue) {
 		const body = {
 			limit: 100,
 			includeMuted: true,
 			sortField: "lastReportedAt",
 			sortDirection: "desc",
-			reviewState: queue
+			reviewState: queue,
 		}
 		if (cursor) body.cursor = cursor
 		return this.agent.tools.ozone.moderation.queryStatuses(body, {
 			encoding: "application/json",
 			headers: {
-				"atproto-proxy": `${this.labelerDid}#atproto_labeler`
-			}
+				"atproto-proxy": `${this.labelerDid}#atproto_labeler`,
+			},
 		})
 	}
+
 	async getReports(queueParam, queuePages) {
 		let queue = "tools.ozone.moderation.defs#reviewOpen"
 		if (queueParam == "escalated") {
@@ -76,11 +79,12 @@ class ClientAPI {
 					}
 				} else {
 					console.warn(`Attempt ${i + 1} failed, retrying...`)
-					await new Promise(resolve => setTimeout(resolve, 1000))
+					await new Promise((resolve) => setTimeout(resolve, 1000))
 				}
 			}
 		}
 	}
+
 	async emitModerationEvent(uri, event, cid) {
 		this.eventQueue.enqueue(async () => {
 			if (!cid) {
@@ -104,12 +108,13 @@ class ClientAPI {
 				{
 					encoding: "application/json",
 					headers: {
-						"atproto-proxy": `${this.labelerDid}#atproto_labeler`
-					}
+						"atproto-proxy": `${this.labelerDid}#atproto_labeler`,
+					},
 				}
 			)
 		})
 	}
+
 	async label(data, cid) {
 		const event = {
 			$type: "tools.ozone.moderation.defs#modEventLabel",
@@ -122,6 +127,7 @@ class ClientAPI {
 		}
 		await this.acknowledgeReport(data.uri, cid)
 	}
+
 	async acknowledgeReport(uri, cid) {
 		const event = {
 			$type: "tools.ozone.moderation.defs#modEventAcknowledge",
@@ -129,6 +135,7 @@ class ClientAPI {
 
 		await this.emitModerationEvent(uri, event, cid)
 	}
+
 	async escalate(uri, cid) {
 		const event = {
 			$type: "tools.ozone.moderation.defs#modEventEscalate",
@@ -136,6 +143,7 @@ class ClientAPI {
 
 		await this.emitModerationEvent(uri, event, cid)
 	}
+
 	async searchPosts(query, cursor) {
 		const body = {
 			q: query,
@@ -145,6 +153,7 @@ class ClientAPI {
 		if (cursor) body.cursor = cursor
 		return this.agent.app.bsky.feed.searchPosts(body)
 	}
+
 	static fromSession(session, labelerDid) {
 		return new ClientAPI(new Agent(session), labelerDid)
 	}

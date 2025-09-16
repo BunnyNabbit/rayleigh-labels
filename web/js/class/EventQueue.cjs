@@ -1,14 +1,16 @@
 class EventQueue {
+	/** */
 	constructor() {
 		this.queue = []
 		this.isProcessing = false
 		this.retryDelays = [1000, 2000, 4000, 8000, 12000, 18000, 30000] // Exponential backoff delays
-		window.addEventListener('beforeunload', (event) => {
+		window.addEventListener("beforeunload", (event) => {
 			if (this.pendingCount > 0) {
 				event.preventDefault()
 			}
 		})
 	}
+	/** Add an event to the queue */
 	/** Add an event to the queue */
 	enqueue(event, volatile = false) {
 		this.queue.push({ event, retries: 0, volatile })
@@ -31,7 +33,7 @@ class EventQueue {
 					this.queue[0].retries += 1
 					await EventQueue.sleep(this.retryDelays[retries])
 				} else {
-					if (!volatile) console.error('Event failed after maximum retries:', event, error)
+					if (!volatile) console.error("Event failed after maximum retries:", event, error)
 					this.queue.shift()
 				}
 			}
@@ -41,7 +43,7 @@ class EventQueue {
 	}
 
 	static sleep(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms))
+		return new Promise((resolve) => setTimeout(resolve, ms))
 	}
 
 	get pendingCount() {

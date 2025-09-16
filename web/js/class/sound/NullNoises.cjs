@@ -1,11 +1,12 @@
 class NullNoises {
-   constructor() { }
+	/** */
+	constructor() {}
 
-   playSound() { }
+	playSound() {}
 
-   destroy() { }
+	destroy() {}
 
-   static sounds = {}
+	static sounds = {}
 }
 
 module.exports = NullNoises

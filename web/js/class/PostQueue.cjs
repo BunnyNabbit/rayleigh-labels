@@ -2,6 +2,7 @@ const { randomIntFromInterval } = require("../utils.cjs")
 const db = require("../db.cjs")
 
 class PostQueue {
+	/** */
 	constructor(api, configurationModal) {
 		this.api = api
 		this.configurationModal = configurationModal
@@ -10,20 +11,22 @@ class PostQueue {
 		this.interface = null
 		this.runningPopulator = null
 	}
-	// Get the next set of posts
+	/** Get the next set of posts */
 	getSet() {
-		this.populateQueue().then(() => {
-			console.log("Queue populated")
-			this.runningPopulator = null
-			if (this.queue[0]) {
-				this.interface.displaySet()
-			} else {
-				alert(PostQueue.funnyEmptyQueueMessages[randomIntFromInterval(0, PostQueue.funnyEmptyQueueMessages.length - 1)])
-			}
-		}).catch((err) => {
-			alert("Error while getting queue")
-			console.error(err)
-		})
+		this.populateQueue()
+			.then(() => {
+				console.log("Queue populated")
+				this.runningPopulator = null
+				if (this.queue[0]) {
+					this.interface.displaySet()
+				} else {
+					alert(PostQueue.funnyEmptyQueueMessages[randomIntFromInterval(0, PostQueue.funnyEmptyQueueMessages.length - 1)])
+				}
+			})
+			.catch((err) => {
+				alert("Error while getting queue")
+				console.error(err)
+			})
 	}
 
 	async populateQueue() {
@@ -46,11 +49,16 @@ class PostQueue {
 	}
 
 	labelPost(post, add, negate) {
-		this.api.label({
-			add, negate, uri: post.uri
-		}, post.cid)
-		post.labels = post.labels.filter(label => !negate.includes(label.val))
-		add.forEach(label => post.labels.push({ val: label }))
+		this.api.label(
+			{
+				add,
+				negate,
+				uri: post.uri,
+			},
+			post.cid
+		)
+		post.labels = post.labels.filter((label) => !negate.includes(label.val))
+		add.forEach((label) => post.labels.push({ val: label }))
 	}
 
 	getLabels() {
@@ -60,34 +68,29 @@ class PostQueue {
 	static filterTransformEmbedTypes(posts) {
 		const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view", "app.bsky.embed.video#view"]
 		console.log("posts", posts)
-		const filteredPosts = posts.filter(post => {
+		const filteredPosts = posts.filter((post) => {
 			return post.embed && supportedTypes.includes(post.embed["$type"])
 		})
-		filteredPosts.forEach(post => {
+		filteredPosts.forEach((post) => {
 			console.log(post)
 			const type = post.embed["$type"]
-			if (type == "app.bsky.embed.images#view") {
-				post.renderImages = post.embed.images
-			}
+			if (type == "app.bsky.embed.images#view") post.renderImages = post.embed.images
 			if (type == "app.bsky.embed.recordWithMedia#view") {
-				if (post.embed.media["$type"] == "app.bsky.embed.images#view") {
-					post.renderImages = post.embed.media.images
-				}
-				if (post.embed.media["$type"] == "app.bsky.embed.video#view") {
-					post.renderImages = [post.embed.media]
-				}
+				if (post.embed.media["$type"] == "app.bsky.embed.images#view") post.renderImages = post.embed.media.images
+				if (post.embed.media["$type"] == "app.bsky.embed.video#view") post.renderImages = [post.embed.media]
 				if (post.embed.media["$type"] == "app.bsky.embed.external#view" && post.embed.media["$type"].external.thumb) {
-					post.renderImages = [{
-						fullsize: post.embed.media["$type"].external.thumb
-					}]
+					post.renderImages = [
+						{
+							fullsize: post.embed.media["$type"].external.thumb,
+						},
+					]
 				}
 			}
-			if (type == "app.bsky.embed.video#view") {
-				post.renderImages = [post.embed]
-			}
+			if (type == "app.bsky.embed.video#view") post.renderImages = [post.embed]
 		})
 		return filteredPosts
 	}
+	// prettier-ignore
 	static funnyEmptyQueueMessages = [
 		"Incredible! You're a real bridge raiser!",
 		"YOU'RE WINNER !",
@@ -98,7 +101,7 @@ class PostQueue {
 		"Good job! You've done it!",
 		"A WINNER IS YOU",
 		"glad you did it babe",
-		"i've won...... but at what cost?"
+		"i've won...... but at what cost?",
 	]
 }
 
