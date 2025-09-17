@@ -49,7 +49,7 @@ class SearchPopulator extends BaseQueuePopulator {
 	static sleep(ms) {
 		return new Promise((resolve) => setTimeout(resolve, ms))
 	}
-	static searchDelay = 5000
+	static searchDelay = 100
 }
 
 module.exports = SearchPopulator
