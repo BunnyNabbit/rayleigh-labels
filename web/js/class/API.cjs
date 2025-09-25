@@ -56,6 +56,8 @@ class ClientAPI {
 			throw new Error("Failed to get queue")
 		}
 		let cursor = null
+		const maxTimeMs = 10000 // 10 seconds
+		const startTime = Date.now()
 		for (let i = 0; i <= queuePages; i++) {
 			try {
 				const statusResponse = await this.queryStatuses(cursor, queue)
@@ -70,6 +72,17 @@ class ClientAPI {
 					return reports
 				}
 			} catch (error) {
+				console.log(error)
+				const elapsed = Date.now() - startTime
+				const is502 = error.status === 502
+				if (is502 && elapsed > maxTimeMs) {
+					console.warn(`HTTP 502 persisted for ${elapsed}ms, aborting.`)
+					if (reports.length) {
+						return reports
+					} else {
+						fail()
+					}
+				}
 				if (i === queuePages) {
 					console.error(error)
 					if (reports.length) {
