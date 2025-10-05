@@ -1,10 +1,17 @@
 const { randomIntFromInterval } = require("../utils.cjs")
 const db = require("../db.cjs")
+/** @import ClientAPI from "./API.cjs" 8 */
+/** @import ConfigurationModal from "./modal/ConfigurationModal.cjs" 8 */
 
 class PostQueue {
-	/** */
+	/**
+	 * @param {ClientAPI} api
+	 * @param {ConfigurationModal} configurationModal
+	 */
 	constructor(api, configurationModal) {
+		/** @type {ClientAPI} */
 		this.api = api
+		/** @type {ConfigurationModal} */
 		this.configurationModal = configurationModal
 		this.queue = []
 		this.backQueue = []
