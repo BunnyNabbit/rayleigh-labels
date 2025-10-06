@@ -1,142 +1,142 @@
-<!DOCTYPE html>
-<html lang=en>
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="content-language" content="en-gb" />
+		<title>Rayleigh Moderation</title>
+		<style>
+			body,
+			html {
+				height: 100%;
+				margin: 0;
+			}
 
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv='content-language' content='en-gb'>
-	<title>Rayleigh Moderation</title>
-	<style>
-		body,
-		html {
-			height: 100%;
-			margin: 0;
-		}
+			:root {
+				--background-color: black;
+				--text-color: white;
+				--text-shadow: 0px 2px 2px blue;
+				--label-background-color: #000000;
+				--label-text-color: #ffffff;
+				--label-border-color: #33333375;
+				--alt-text-fallback-color: #a5a5a5;
 
-		:root {
-			--background-color: black;
-			--text-color: white;
-			--text-shadow: 0px 2px 2px blue;
-			--label-background-color: #000000;
-			--label-text-color: #ffffff;
-			--label-border-color: #33333375;
-			--alt-text-fallback-color: #a5a5a5;
+				--dialog-background-color: #13152b;
+				--dialog-border-color: #202449;
+				--dialog-text-color: #ffffff;
+				--dialog-backdrop-gradient: radial-gradient(circle, rgba(32, 36, 73, 0.64) 0%, rgba(32, 36, 73, 0.45) 21%, rgba(32, 36, 73, 0.18) 46%);
+			}
 
-			--dialog-background-color: #13152b;
-			--dialog-border-color: #202449;
-			--dialog-text-color: #ffffff;
-			--dialog-backdrop-gradient: radial-gradient(circle,rgba(32, 36, 73, 0.64) 0%, rgba(32, 36, 73, 0.45) 21%, rgba(32, 36, 73, 0.18) 46%);
-		}
+			dialog {
+				background-color: var(--dialog-background-color);
+				border-color: var(--dialog-border-color);
+				color: var(--dialog-text-color);
+				font-family: Arial, Helvetica, sans-serif;
+			}
 
-		dialog {
-			background-color: var(--dialog-background-color);
-			border-color: var(--dialog-border-color);
-			color: var(--dialog-text-color);
-			font-family: Arial, Helvetica, sans-serif;
-		}
+			dialog::backdrop {
+				background: var(--dialog-backdrop-gradient);
+			}
 
-		dialog::backdrop {
-			background: var(--dialog-backdrop-gradient);
-		}
+			body {
+				background-color: var(--background-color);
+			}
 
-		body {
-			background-color: var(--background-color);
-		}
+			/* https://stackoverflow.com/a/18490463 */
+			.fullscreen-image {
+				max-width: 100%;
+				max-height: 100%;
+				bottom: 0;
+				left: 0;
+				margin: auto;
+				overflow: auto;
+				position: fixed;
+				right: 0;
+				top: 0;
+				-o-object-fit: contain;
+				object-fit: contain;
+			}
 
-		/* https://stackoverflow.com/a/18490463 */
-		.fullscreen-image {
-			max-width: 100%;
-			max-height: 100%;
-			bottom: 0;
-			left: 0;
-			margin: auto;
-			overflow: auto;
-			position: fixed;
-			right: 0;
-			top: 0;
-			-o-object-fit: contain;
-			object-fit: contain;
-		}
-		
-		.current-labels, .position-indicator {
-			z-index: 1;
-		}
+			.current-labels,
+			.position-indicator {
+				z-index: 1;
+			}
 
-		.position-indicator {
-			position: fixed;
-			text-align: center;
-			width: 100%;
-			bottom: 0%;
-		}
+			.position-indicator {
+				position: fixed;
+				text-align: center;
+				width: 100%;
+				bottom: 0%;
+			}
 
-		.font {
-			font-family: Arial, Helvetica, sans-serif;
-			color: white;
-			text-shadow: var(--text-shadow);
-		}
+			.font {
+				font-family: Arial, Helvetica, sans-serif;
+				color: white;
+				text-shadow: var(--text-shadow);
+			}
 
-		.current-labels {
-			position: fixed;
-		}
+			.current-labels {
+				position: fixed;
+			}
 
-		.label {
-			height: 16px;
-		}
+			.label {
+				height: 16px;
+			}
 
-		input[type=checkbox] {
-			display: none;
-		}
+			input[type="checkbox"] {
+				display: none;
+			}
 
-		input[type=checkbox]+label {
-			text-shadow: initial;
-			display: inline-block;
-			margin-top: 4px;
-			margin-bottom: 0px;
-			margin-left: 1px;
-			margin-right: 1px;
-			padding: 2px 4px;
-			color: #333;
-			background-color: #e0e0e0;
-			opacity: 0.4;
-			text-align: center;
-			vertical-align: middle;
-			cursor: pointer;
-			font-size: 12px;
-			border-radius: 4px;
-			border-bottom: outset;
-			border-color: rgba(51, 51, 51, 0.459);
-		}
+			input[type="checkbox"] + label {
+				text-shadow: initial;
+				display: inline-block;
+				margin-top: 4px;
+				margin-bottom: 0px;
+				margin-left: 1px;
+				margin-right: 1px;
+				padding: 2px 4px;
+				color: #333;
+				background-color: #e0e0e0;
+				opacity: 0.4;
+				text-align: center;
+				vertical-align: middle;
+				cursor: pointer;
+				font-size: 12px;
+				border-radius: 4px;
+				border-bottom: outset;
+				border-color: rgba(51, 51, 51, 0.459);
+			}
 
-		input[type=checkbox]:checked+label {
-			/* background-color: #e0e0e0; */
-			opacity: 1;
-		}
+			input[type="checkbox"]:checked + label {
+				/* background-color: #e0e0e0; */
+				opacity: 1;
+			}
 
-		.hidden {
-			display: none;
-		}
+			.hidden {
+				display: none;
+			}
 
-		.grid-item {
-			min-height: fit-content
-		}
+			.grid-item {
+				min-height: fit-content;
+			}
 
-		img[alt], video[alt] {
-			color: var(--alt-text-fallback-color);
-		}
-	</style>
-</head>
+			img[alt],
+			video[alt] {
+				color: var(--alt-text-fallback-color);
+			}
+		</style>
+	</head>
 
-<body>
-	<div id="singlePostInterface" class="hidden">
-		<div id="subjectDisplay">
-			<video controls autoplay loop muted id="currentVideoSubject" class="fullscreen-image hidden"></video>
+	<body>
+		<div id="singlePostInterface" class="hidden">
+			<div id="subjectDisplay">
+				<video controls autoplay loop muted id="currentVideoSubject" class="fullscreen-image hidden"></video>
+			</div>
+			<div id="currentLabels" class="current-labels font">
+				<input id="aidan" type="checkbox" accesskey="1" />
+				<label for="aidan" style="background-color: rgb(0, 0, 0); color: rgb(255, 255, 255)">Loading</label>
+			</div>
+			<p id="positionIndicator" class="position-indicator font" title="Loading">Loading queue</p>
 		</div>
-		<div id="currentLabels" class="current-labels font">
-			<input id="aidan" type="checkbox" accesskey="1">
-			<label for="aidan" style="background-color: rgb(0, 0, 0);color: rgb(255, 255, 255);">Loading</label>
-		</div>
-		<p id="positionIndicator" class="position-indicator font" title="Loading">Loading queue</p>
-	</div>
-</body>
-
+	</body>
 </html>
