@@ -9,7 +9,7 @@ export class ClientAPI {
 	constructor(agent, labelerDid) {
 		this.agent = agent
 		this.labelerDid = labelerDid
-		this.agent.addLabeler(labelerDid)
+		this.ready = this.agent.addLabeler(labelerDid).finally()
 		this.eventQueue = new EventQueue()
 	}
 

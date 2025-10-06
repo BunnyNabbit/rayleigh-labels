@@ -29,12 +29,13 @@ export class MainMenuModal extends BaseMenuModal {
 		button.textContent = name
 		button.onclick = () => {
 			const questionModal = new PopulatorQuestionModal(this.toyNoises)
-			questionModal.on("populator", (runPopulator) => {
+			questionModal.on("populator", async (runPopulator) => {
+				this.close()
 				const api = ClientAPI.fromSession(this.primaryAgent, this.primaryLabelerDid)
+				await api.ready
 				const postQueue = new PostQueue(api, this.configurationModal)
 				const rInterface = new interfaceClass(postQueue, this.toyNoises)
 				postQueue.runningPopulator = runPopulator(postQueue)
-				this.close()
 				rInterface.open()
 			})
 			questionModal.open()
