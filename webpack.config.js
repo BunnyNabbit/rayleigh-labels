@@ -1,26 +1,24 @@
-'use strict'
+"use strict"
 
-const path = require('path')
-const autoprefixer = require('autoprefixer')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require("path")
+const autoprefixer = require("autoprefixer")
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = {
-	mode: 'development',
-	entry: './web/js/index.mjs',
+	mode: "development",
+	entry: "./web/js/index.js",
 	devtool: "source-map",
 	output: {
-		filename: 'index.js',
-		path: path.resolve(__dirname, 'dist'),
-		assetModuleFilename: '[path][name][ext]'
+		filename: "index.js",
+		path: path.resolve(__dirname, "dist"),
+		assetModuleFilename: "[path][name][ext]",
 	},
 	devServer: {
-		static: path.resolve(__dirname, 'dist'),
+		static: path.resolve(__dirname, "dist"),
 		port: 8080,
-		hot: true
+		hot: true,
 	},
-	plugins: [
-		new HtmlWebpackPlugin({ template: './web/index.html' })
-	],
+	plugins: [new HtmlWebpackPlugin({ template: "./web/index.html" })],
 	module: {
 		rules: [
 			{
@@ -28,33 +26,31 @@ module.exports = {
 				use: [
 					{
 						// Adds CSS to the DOM by injecting a `<style>` tag
-						loader: 'style-loader'
+						loader: "style-loader",
 					},
 					{
 						// Interprets `@import` and `url()` like `import/require()` and will resolve them
-						loader: 'css-loader'
+						loader: "css-loader",
 					},
 					{
 						// Loader for webpack to process CSS with PostCSS
-						loader: 'postcss-loader',
+						loader: "postcss-loader",
 						options: {
 							postcssOptions: {
-								plugins: [
-									autoprefixer
-								]
-							}
-						}
+								plugins: [autoprefixer],
+							},
+						},
 					},
 					{
 						// Loads a SASS/SCSS file and compiles it to CSS
-						loader: 'sass-loader'
-					}
-				]
+						loader: "sass-loader",
+					},
+				],
 			},
 			{
 				test: /\.(png|svg|jpg|jpeg|gif)$/i,
-				type: 'asset/resource',
-			}
-		]
-	}
+				type: "asset/resource",
+			},
+		],
+	},
 }
