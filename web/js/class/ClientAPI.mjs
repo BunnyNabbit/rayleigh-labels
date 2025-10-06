@@ -1,7 +1,7 @@
-const { Agent } = require("@atproto/api")
-const EventQueue = require("./EventQueue.cjs")
+import { Agent } from "@atproto/api"
+import { EventQueue } from "./EventQueue.mjs"
 
-class ClientAPI {
+export class ClientAPI {
 	/**
 	 * @param {Agent} agent
 	 * @param {string} labelerDid
@@ -174,4 +174,4 @@ class ClientAPI {
 	static maxRetries = 5
 }
 
-module.exports = ClientAPI
+export default ClientAPI

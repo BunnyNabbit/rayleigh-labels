@@ -1,8 +1,8 @@
-const BaseMenuModal = require("./BaseMenuModal.cjs")
-const ClientAPI = require("../../class/API.cjs")
-const PostQueue = require("../../class/PostQueue.cjs")
-const QueueQuestionModal = require("./PopulatorQuestionModal.cjs")
-class MainMenuModal extends BaseMenuModal {
+import { BaseMenuModal } from "./BaseMenuModal.mjs"
+import { ClientAPI } from "../../class/ClientAPI.mjs"
+import { PostQueue } from "../../class/PostQueue.mjs"
+import { PopulatorQuestionModal } from "./PopulatorQuestionModal.mjs"
+export class MainMenuModal extends BaseMenuModal {
 	/** */
 	constructor(toyNoises) {
 		super(true, toyNoises)
@@ -28,7 +28,7 @@ class MainMenuModal extends BaseMenuModal {
 		const button = document.createElement("button")
 		button.textContent = name
 		button.onclick = () => {
-			const questionModal = new QueueQuestionModal(this.toyNoises)
+			const questionModal = new PopulatorQuestionModal(this.toyNoises)
 			questionModal.on("populator", (runPopulator) => {
 				const api = ClientAPI.fromSession(this.primaryAgent, this.primaryLabelerDid)
 				const postQueue = new PostQueue(api, this.configurationModal)
@@ -43,4 +43,4 @@ class MainMenuModal extends BaseMenuModal {
 	}
 }
 
-module.exports = MainMenuModal
+export default MainMenuModal

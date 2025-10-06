@@ -6,7 +6,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
 	mode: 'development',
-	entry: './web/js/index.js',
+	entry: './web/js/index.mjs',
 	devtool: "source-map",
 	output: {
 		filename: 'index.js',

@@ -1,8 +1,8 @@
-const BaseMenuModal = require("./BaseMenuModal.cjs")
-const DatabaseDump = require("../DatabaseDump.cjs")
-const db = require("../../db.cjs")
+import BaseMenuModal from "./BaseMenuModal.mjs"
+import DatabaseDump from "../DatabaseDump.mjs"
+import db from "../../db.mjs"
 
-class MaintenanceModal extends BaseMenuModal {
+export class MaintenanceModal extends BaseMenuModal {
 	/** */
 	constructor(toyNoises) {
 		super(false, toyNoises)
@@ -85,4 +85,4 @@ class MaintenanceModal extends BaseMenuModal {
 	static localStoragePrefix = "rayleigh"
 }
 
-module.exports = MaintenanceModal
+export default MaintenanceModal

@@ -1,6 +1,6 @@
-const BaseMenuModal = require("./BaseMenuModal.cjs")
-const ToyNoises = require("../sound/ToyNoises.cjs")
-const { EventEmitter } = require("events")
+import { BaseMenuModal } from "./BaseMenuModal.mjs"
+import { ToyNoises } from "../sound/ToyNoises.mjs"
+import { EventEmitter } from "events"
 
 /**
  * Represents a configurable setting.
@@ -68,11 +68,13 @@ class Setting extends EventEmitter {
 }
 
 class NumberRangeSetting extends Setting {
+	/** */
 	constructor(id, label, defaultValue, minValue, maxValue, options) {
 		super(id, label, Setting.settingType.NUMBER, defaultValue, options)
 		this.minValue = minValue
 		this.maxValue = maxValue
 	}
+
 	createInputElement() {
 		const inputElement = document.createElement("input")
 		inputElement.setAttribute("type", "number")
@@ -89,9 +91,11 @@ class NumberRangeSetting extends Setting {
 }
 
 class BooleanSetting extends Setting {
+	/** */
 	constructor(id, label, defaultValue, options) {
 		super(id, label, Setting.settingType.BOOLEAN, defaultValue, options)
 	}
+
 	createInputElement() {
 		const inputElement = document.createElement("input")
 		inputElement.setAttribute("type", "checkbox")
@@ -102,14 +106,17 @@ class BooleanSetting extends Setting {
 		label.textContent = this.label
 		this.input = inputElement
 		return {
-			label, input: inputElement
+			label,
+			input: inputElement,
 		}
 	}
+
 	save(dry) {
 		const data = { id: this.id, value: this.input.checked }
 		if (!dry) localStorage.setItem(Setting.keyPrefix + data.id, data.value)
 		return data
 	}
+
 	load() {
 		if (localStorage.getItem(Setting.keyPrefix + this.id) == null) return null
 		return localStorage.getItem(Setting.keyPrefix + this.id) === "true"
@@ -117,9 +124,11 @@ class BooleanSetting extends Setting {
 }
 
 class SelectSetting extends Setting {
+	/** */
 	constructor(id, label, defaultValue, options) {
 		super(id, label, Setting.settingType.SELECT, defaultValue, options)
 	}
+
 	createInputElement() {
 		const inputElement = document.createElement("select")
 		inputElement.setAttribute("id", this.id)
@@ -137,15 +146,18 @@ class SelectSetting extends Setting {
 		label.textContent = this.label
 		this.input = inputElement
 		return {
-			label, input: inputElement
+			label,
+			input: inputElement,
 		}
 	}
 }
 
 class TextSetting extends Setting {
+	/** */
 	constructor(id, label, defaultValue) {
 		super(id, label, Setting.settingType.TEXT, defaultValue)
 	}
+
 	createInputElement() {
 		const inputElement = document.createElement("input")
 		inputElement.setAttribute("type", "text")
@@ -156,15 +168,18 @@ class TextSetting extends Setting {
 		label.textContent = this.label
 		this.input = inputElement
 		return {
-			label, input: inputElement
+			label,
+			input: inputElement,
 		}
 	}
 }
 
 class ColorSetting extends Setting {
+	/** */
 	constructor(id, label, defaultValue) {
 		super(id, label, Setting.settingType.COLOR, defaultValue)
 	}
+
 	createInputElement() {
 		const inputElement = document.createElement("input")
 		inputElement.setAttribute("type", "color")
@@ -175,21 +190,25 @@ class ColorSetting extends Setting {
 		label.textContent = this.label
 		this.input = inputElement
 		return {
-			label, input: inputElement
+			label,
+			input: inputElement,
 		}
 	}
 }
 
 class DisplayElement extends Setting {
+	/** */
 	constructor(type, label) {
 		super(type, label, Setting.settingType.VISUAL_ELEMENT, "", { serializable: false })
 	}
 }
 
 class Divider extends DisplayElement {
+	/** */
 	constructor() {
 		super("divider")
 	}
+
 	createInputElement() {
 		const element = document.createElement("hr")
 		return { label: element }
@@ -197,10 +216,12 @@ class Divider extends DisplayElement {
 }
 
 class Header extends DisplayElement {
+	/** */
 	constructor(label, level) {
 		super("header", label)
 		this.level = level
 	}
+
 	createInputElement() {
 		const element = document.createElement("h" + this.level)
 		element.textContent = this.label
@@ -209,9 +230,11 @@ class Header extends DisplayElement {
 }
 
 class Text extends DisplayElement {
+	/** */
 	constructor(label) {
 		super("text", label)
 	}
+
 	createInputElement() {
 		const element = document.createElement("p")
 		element.textContent = this.label
@@ -221,12 +244,14 @@ class Text extends DisplayElement {
 
 /** Represents setting containing multiple ozher settings and multiple of itself */
 class CompoundSetting extends Setting {
+	/** */
 	constructor(id, label, settingCompounds, options = { allowMultiple: false }) {
 		options.overrideLoad = true
 		super(id, label, Setting.settingType.VISUAL_ELEMENT, "", options)
 		this.settingCompounds = settingCompounds
 		this.value = this.load()
 	}
+
 	createInputElement() {
 		if (this.options.allowMultiple) {
 			const addButton = document.createElement("button")
@@ -241,18 +266,21 @@ class CompoundSetting extends Setting {
 			return { label: null, input: null }
 		}
 	}
+
 	addSetting() {
-		const newSetting = this.settingCompounds.map(compound => new compound.settingClass(...compound.params))
+		const newSetting = this.settingCompounds.map((compound) => new compound.settingClass(...compound.params))
 		// newSetting.forEach((setting, index) => setting.id = `${index}`)
 		this.settings.push(newSetting)
 		this.save()
 		return newSetting
 	}
+
 	save(dry) {
-		let data = this.settings.map(compound => compound.map(setting => setting.save(true)))
+		let data = this.settings.map((compound) => compound.map((setting) => setting.save(true)))
 		if (!dry) localStorage.setItem(Setting.keyPrefix + this.id, JSON.stringify(data))
 		return data
 	}
+
 	load() {
 		const data = localStorage.getItem(Setting.keyPrefix + this.id)
 		if (data == null) {
@@ -277,38 +305,31 @@ class CompoundSetting extends Setting {
 		})
 		return parsed
 	}
+
 	static Compound(settingClass, params) {
 		return {
 			settingClass: settingClass,
-			params: params
+			params: params,
 		}
 	}
 }
 
 class AccountCompound extends CompoundSetting {
+	/** */
 	constructor() {
-		super("account", "Account", [
-			CompoundSetting.Compound(TextSetting, ["handle", "Handle", "example.invalid"]),
-			CompoundSetting.Compound(TextSetting, ["labelerDid", "Labeler DID", "did:plc:123"]),
-			CompoundSetting.Compound(SelectSetting, ["labelerPermission", "Labeler permission", "moderator", { list: ["triage", "moderator", "admin", "system"] }])
-		], { allowMultiple: false, compoundVersion: 1 })
+		super("account", "Account", [CompoundSetting.Compound(TextSetting, ["handle", "Handle", "example.invalid"]), CompoundSetting.Compound(TextSetting, ["labelerDid", "Labeler DID", "did:plc:123"]), CompoundSetting.Compound(SelectSetting, ["labelerPermission", "Labeler permission", "moderator", { list: ["triage", "moderator", "admin", "system"] }])], { allowMultiple: false, compoundVersion: 1 })
 	}
 }
 
 class LabelCompound extends CompoundSetting {
+	/** */
 	constructor() {
-		super("label", "Labels", [
-			CompoundSetting.Compound(TextSetting, ["slug", "Label slug", "example"]),
-			CompoundSetting.Compound(TextSetting, ["readableName", "Label name", "Example"]),
-			CompoundSetting.Compound(TextSetting, ["altKey", "Access key", "1"]),
-			CompoundSetting.Compound(TextSetting, ["policy", "Policy", "Used as an example."]),
-			CompoundSetting.Compound(ColorSetting, ["textColor", "Text color", "#000000"]),
-			CompoundSetting.Compound(ColorSetting, ["backgroundColor", "Background color", "#ffffff"]),
-		], { allowMultiple: true, compoundVersion: 1 })
+		super("label", "Labels", [CompoundSetting.Compound(TextSetting, ["slug", "Label slug", "example"]), CompoundSetting.Compound(TextSetting, ["readableName", "Label name", "Example"]), CompoundSetting.Compound(TextSetting, ["altKey", "Access key", "1"]), CompoundSetting.Compound(TextSetting, ["policy", "Policy", "Used as an example."]), CompoundSetting.Compound(ColorSetting, ["textColor", "Text color", "#000000"]), CompoundSetting.Compound(ColorSetting, ["backgroundColor", "Background color", "#ffffff"])], { allowMultiple: true, compoundVersion: 1 })
 	}
 }
 
-class ConfigurationModal extends BaseMenuModal {
+export class ConfigurationModal extends BaseMenuModal {
+	/** */
 	constructor() {
 		super()
 		this.settings = []
@@ -338,14 +359,15 @@ class ConfigurationModal extends BaseMenuModal {
 		this.addSetting(new NumberRangeSetting("likeScore", "Post like score", 1, -1000, 1000))
 		this.addSetting(new Text("Some settings may require a page refresh to apply."))
 		// Restrained Rayleigh. Use localStorage.setItem(`rayleighSetting:restraints`, "true") to enable
-		if (localStorage.getItem(`${Setting.keyPrefix}restraints`) == "true") { // a bit hacky, since a setting cannot be accessed if it doesn't exist
+		if (localStorage.getItem(`${Setting.keyPrefix}restraints`) == "true") {
+			// a bit hacky, since a setting cannot be accessed if it doesn't exist
 			this.addSetting(new Divider())
 			this.addSetting(new Header("Restrained Rayleigh", 2))
 			this.addSetting(new Text("RR is an experimental tool. Use of restraints may not be suitable for some users."))
 			this.addSetting(new BooleanSetting("restraints", "Enable RR", false))
 			this.addSetting(new Header("Post viewing", 3))
 			this.addSetting(new NumberRangeSetting("minPostViewTIme", "View time", 10, 1, 60))
-			this.addSetting(new TextSetting("postViewTimeTrigger", "Trigger code", "alert(\"Be for real.\")"))
+			this.addSetting(new TextSetting("postViewTimeTrigger", "Trigger code", 'alert("Be for real.")'))
 		}
 		this.renderSettings()
 	}
@@ -361,9 +383,9 @@ class ConfigurationModal extends BaseMenuModal {
 	getCompoundSetting(id) {
 		const setting = this.getSetting(id)
 		const entries = []
-		setting.forEach(settingEntry => {
+		setting.forEach((settingEntry) => {
 			const entry = {}
-			settingEntry.forEach(setting => {
+			settingEntry.forEach((setting) => {
 				entry[setting.id] = setting.value
 			})
 			entries.push(entry)
@@ -403,8 +425,8 @@ class ConfigurationModal extends BaseMenuModal {
 	renderSettings() {
 		for (const setting of this.settings) {
 			if (setting instanceof CompoundSetting) {
-				setting.settings.forEach(compound => compound.forEach(subSetting => this.renderSetting(subSetting, setting)))
-				setting.on("add", newSetting => newSetting.forEach(subSetting => this.renderSetting(subSetting, setting)))
+				setting.settings.forEach((compound) => compound.forEach((subSetting) => this.renderSetting(subSetting, setting)))
+				setting.on("add", (newSetting) => newSetting.forEach((subSetting) => this.renderSetting(subSetting, setting)))
 				this.renderSetting(setting)
 			} else {
 				this.renderSetting(setting)
@@ -413,4 +435,4 @@ class ConfigurationModal extends BaseMenuModal {
 	}
 }
 
-module.exports = ConfigurationModal
+export default ConfigurationModal

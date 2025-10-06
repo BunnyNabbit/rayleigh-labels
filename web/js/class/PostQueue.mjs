@@ -1,9 +1,9 @@
-const { randomIntFromInterval } = require("../utils.cjs")
-const db = require("../db.cjs")
+import { randomIntFromInterval } from "../utils.mjs"
+import { db } from "../db.mjs"
 /** @import ClientAPI from "./API.cjs" 8 */
 /** @import ConfigurationModal from "./modal/ConfigurationModal.cjs" 8 */
 
-class PostQueue {
+export class PostQueue {
 	/**
 	 * @param {ClientAPI} api
 	 * @param {ConfigurationModal} configurationModal
@@ -112,4 +112,4 @@ class PostQueue {
 	]
 }
 
-module.exports = PostQueue
+export default PostQueue

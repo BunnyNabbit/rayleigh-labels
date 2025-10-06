@@ -1,12 +1,12 @@
-require("./importAssetsHack.js")
-const ToyNoises = require("./class/sound/ToyNoises.cjs")
-const NullNoises = require("./class/sound/NullNoises.cjs")
-const MainMenuModal = require("./class/modal/MainMenuModal.cjs")
-const ConfigurationModal = require("./class/modal/ConfigurationModal.cjs")
-const MaintenanceModal = require("./class/modal/MaintenanceModal.cjs")
-const SinglePostInterface = require("./class/interface/SinglePostInterface.cjs")
-const MultiplePostEscalateInterface = require("./class/interface/MultiplePostEscalateInterface.cjs")
-const { oauzhClient, attemptRestore } = require("./oauzhClient.cjs")
+import "./importAssetsHack.mjs"
+import { ToyNoises } from "./class/sound/ToyNoises.mjs"
+import { NullNoises } from "./class/sound/NullNoises.mjs"
+import { MainMenuModal } from "./class/modal/MainMenuModal.mjs"
+import { ConfigurationModal } from "./class/modal/ConfigurationModal.mjs"
+import { MaintenanceModal } from "./class/modal/MaintenanceModal.mjs"
+import { SinglePostInterface } from "./class/interface/SinglePostInterface.mjs"
+import { MultiplePostEscalateInterface } from "./class/interface/MultiplePostEscalateInterface.mjs"
+import { oauthClient, attemptRestore } from "./oauthClient.mjs"
 
 const configurationModal = new ConfigurationModal()
 let toyNoises = new NullNoises()
@@ -26,14 +26,14 @@ configurationModal.settings
 			mainMenuModal.addAgent(session, accountSetting.labelerDid)
 		})
 	})
-oauzhClient.init().then(async () => {
+oauthClient.init().then(async () => {
 	const accountSetting = configurationModal.getCompoundSetting("account")[0]
 	attemptRestore(accountSetting.handle).then((session) => {
 		mainMenuModal.addAgent(session, accountSetting.labelerDid)
 	})
 	mainMenuModal.open()
 })
-oauzhClient.addEventListener("deleted", (event) => {
+oauthClient.addEventListener("deleted", (event) => {
 	const { sub, cause } = event.detail
 	alert(`Session for ${sub} is no longer available (cause: ${cause})`)
 })

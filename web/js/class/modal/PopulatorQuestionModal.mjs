@@ -1,8 +1,8 @@
-const BaseMenuModal = require("./BaseMenuModal.cjs")
-const SearchPopulator = require("../populator/SearchPopulator.cjs")
-const ReportQueuePopulator = require("../populator/ReportQueuePopulator.cjs")
+import { BaseMenuModal } from "./BaseMenuModal.mjs"
+import { SearchPopulator } from "../populator/SearchPopulator.mjs"
+import { ReportQueuePopulator } from "../populator/ReportQueuePopulator.mjs"
 
-class PopulatorQuestionModal extends BaseMenuModal {
+export class PopulatorQuestionModal extends BaseMenuModal {
 	/** */
 	constructor(toyNoises) {
 		super(false, toyNoises)
@@ -23,4 +23,4 @@ class PopulatorQuestionModal extends BaseMenuModal {
 	}
 }
 
-module.exports = PopulatorQuestionModal
+export default PopulatorQuestionModal

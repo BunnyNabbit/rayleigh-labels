@@ -1,9 +1,9 @@
-const { SoundEffect } = require("../../vendor/sfxr")
+import { SoundEffect } from "../../vendor/sfxr.cjs"
 
 /**
  * Class for playing SFXR sound effects
  */
-class ToyNoises {
+export class ToyNoises {
 	/**
 	 * Create a ToyNoises instance.
 	 */
@@ -48,4 +48,4 @@ class ToyNoises {
 	}
 }
 
-module.exports = ToyNoises
+export default ToyNoises

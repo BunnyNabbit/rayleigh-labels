@@ -150,7 +150,7 @@ class StreamReader extends GrowBuffer {
 /**Namespace for database dump operations.
  * @namespace DatabaseDump
  */
-class DatabaseDump {
+export class DatabaseDump {
 	static collectionTypes = {
 		eof: 0x00,
 		acknowledgedPosts: 0x01,
@@ -270,4 +270,4 @@ class DatabaseDump {
 	}
 }
 
-module.exports = DatabaseDump
+export default DatabaseDump

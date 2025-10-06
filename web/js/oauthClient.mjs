@@ -1,5 +1,5 @@
-const { BrowserOAuthClient } = require("@atproto/oauth-client-browser")
-const HandleResolver = require("./class/HandleResolver.cjs")
+import { BrowserOAuthClient } from "@atproto/oauth-client-browser"
+import { HandleResolver } from "./class/HandleResolver.mjs"
 
 let clientMetadata = undefined
 
@@ -27,22 +27,22 @@ if (!isLoopback()) {
 	}
 }
 
-const oauzhClient = new BrowserOAuthClient({
+export const oauthClient = new BrowserOAuthClient({
 	handleResolver: "https://bsky.social",
 	clientMetadata,
 })
 
-const handleResolver = new HandleResolver()
+export const handleResolver = new HandleResolver()
 
-async function attemptRestore(handle) {
+export async function attemptRestore(handle) {
 	const did = await handleResolver.resolve(handle).catch((err) => {
 		console.error(err)
 		alert(`Unable to resolve ${handle}`)
 	})
 	if (did) {
-		const sessionRestorePromise = oauzhClient.restore(did).catch(() => {
+		const sessionRestorePromise = oauthClient.restore(did).catch(() => {
 			if (confirm("Session could not be restored. Do you want to sign in?")) {
-				oauzhClient.signIn(handle, {
+				oauthClient.signIn(handle, {
 					prompt: "login",
 				})
 			}
@@ -50,5 +50,3 @@ async function attemptRestore(handle) {
 		return await sessionRestorePromise
 	}
 }
-
-module.exports = { oauzhClient, handleResolver, attemptRestore }

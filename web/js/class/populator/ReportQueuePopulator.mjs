@@ -1,9 +1,9 @@
-const PostQueue = require("../PostQueue.cjs")
-const BaseQueuePopulator = require("./BaseQueuePopulator.cjs")
-const { chunkArray } = require("../../utils.cjs")
-const API = require("../API.cjs")
+import { PostQueue } from "../PostQueue.mjs"
+import { BaseQueuePopulator } from "./BaseQueuePopulator.mjs"
+import { chunkArray } from "../../utils.mjs"
+import { ClientAPI } from "../ClientAPI.mjs"
 
-class SearchPopulator extends BaseQueuePopulator {
+export class ReportQueuePopulator extends BaseQueuePopulator {
 	/** */
 	constructor(postQueue) {
 		super(postQueue)
@@ -32,7 +32,7 @@ class SearchPopulator extends BaseQueuePopulator {
 		let reportQueue = []
 		const uris = response.map((report) => report.subject.uri).filter((element) => element)
 		const promises = []
-		chunkArray(uris, API.bulkHydrateLimit).forEach((postChunk) => {
+		chunkArray(uris, ClientAPI.bulkHydrateLimit).forEach((postChunk) => {
 			const hydratePromise = this.postQueue.api.hydratePosts(postChunk)
 			promises.push(hydratePromise)
 			hydratePromise.then((response) => {
@@ -71,4 +71,4 @@ class SearchPopulator extends BaseQueuePopulator {
 	static searchDelay = 5000
 }
 
-module.exports = SearchPopulator
+export default ReportQueuePopulator

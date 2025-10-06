@@ -1,8 +1,8 @@
-const ToyNoises = require("../sound/ToyNoises.cjs")
-const InputControls = require("../InputControls.cjs")
-const GenericInterface = require("./GenericInterface.cjs")
+import { ToyNoises } from "../sound/ToyNoises.mjs"
+import { InputControls } from "../InputControls.mjs"
+import { GenericInterface } from "./GenericInterface.mjs"
 
-class SinglePostInterface extends GenericInterface {
+export class SinglePostInterface extends GenericInterface {
 	/** */
 	constructor(postQueue, toyNoises) {
 		super(postQueue, toyNoises, true)
@@ -194,4 +194,4 @@ class SinglePostInterface extends GenericInterface {
 	}
 }
 
-module.exports = SinglePostInterface
+export default SinglePostInterface

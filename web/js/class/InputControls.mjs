@@ -1,6 +1,6 @@
-const EventEmitter = require("events")
+import { EventEmitter } from "events"
 
-class InputControls extends EventEmitter {
+export class InputControls extends EventEmitter {
 	/** */
 	constructor() {
 		super()
@@ -48,4 +48,5 @@ class InputControls extends EventEmitter {
 		STILL: 0,
 	}
 }
-module.exports = InputControls
+
+export default InputControls

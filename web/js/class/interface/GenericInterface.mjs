@@ -1,6 +1,6 @@
-const Hls = require("hls.js")
+import Hls from "hls.js"
 
-class GenericInterface {
+export class GenericInterface {
 	/** */
 	constructor(postQueue, toyNoises, disableLabels) {
 		this.postQueue = postQueue
@@ -130,4 +130,4 @@ class GenericInterface {
 	}
 }
 
-module.exports = GenericInterface
+export default GenericInterface

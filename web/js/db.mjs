@@ -1,6 +1,6 @@
-const { Dexie } = require("dexie")
+import { Dexie } from "dexie"
 
-const db = new Dexie("myDatabase")
+export const db = new Dexie("myDatabase")
 
 db.version(1).stores({
 	// repoCrawlStatus: 'did, collection, status, dateStartIndex, dateEndIndex',
@@ -10,4 +10,4 @@ db.version(1).stores({
 	// pendingHydrate: 'uri',
 })
 
-module.exports = db
+export default db

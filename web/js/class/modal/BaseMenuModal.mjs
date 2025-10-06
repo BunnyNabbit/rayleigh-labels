@@ -1,8 +1,8 @@
-const ToyNoises = require("../sound/ToyNoises.cjs")
-const EventEmitter = require("events")
+import { ToyNoises } from "../sound/ToyNoises.mjs"
+import { EventEmitter } from "events"
 
 /** Base class for creating modal dialogs.*/
-class BaseMenuModal extends EventEmitter {
+export class BaseMenuModal extends EventEmitter {
 	/**Creates an instance of BaseMenuModal.
 	 * @param {boolean} preventDialogClose If true, prevents the dialog from closing when the Escape key is pressed.
 	 * @param {ToyNoises} toyNoises An instance of ToyNoises for playing sounds.
@@ -57,4 +57,4 @@ class BaseMenuModal extends EventEmitter {
 	}
 }
 
-module.exports = BaseMenuModal
+export default BaseMenuModal

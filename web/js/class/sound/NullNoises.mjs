@@ -1,4 +1,4 @@
-class NullNoises {
+export class NullNoises {
 	/** */
 	constructor() {}
 
@@ -9,4 +9,4 @@ class NullNoises {
 	static sounds = {}
 }
 
-module.exports = NullNoises
+export default NullNoises

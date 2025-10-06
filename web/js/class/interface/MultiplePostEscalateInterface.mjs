@@ -1,10 +1,9 @@
-// const ToyNoises = require("../sound/ToyNoises.cjs")
-const InputControls = require("../InputControls.cjs")
-const GenericInterface = require("./GenericInterface.cjs")
-const ToyNoises = require("../sound/ToyNoises.cjs")
+import { InputControls } from "../InputControls.mjs"
+import { GenericInterface } from "./GenericInterface.mjs"
+import { ToyNoises } from "../sound/ToyNoises.mjs"
 
 // Displays media from posts in a grid. Click to escalate a post, removing it from queue and view.
-class MultiplePostEscalateInterface extends GenericInterface {
+export class MultiplePostEscalateInterface extends GenericInterface {
 	/** */
 	constructor(postQueue, toyNoises) {
 		super(postQueue, toyNoises, true)
@@ -230,4 +229,4 @@ class MultiplePostEscalateInterface extends GenericInterface {
 	}
 }
 
-module.exports = MultiplePostEscalateInterface
+export default MultiplePostEscalateInterface

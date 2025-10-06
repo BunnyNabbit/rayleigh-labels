@@ -1,8 +1,8 @@
-const PostQueue = require("../PostQueue.cjs")
-const BaseQueuePopulator = require("./BaseQueuePopulator.cjs")
-const db = require("../../db.cjs")
+import {PostQueue} from "../PostQueue.mjs"
+import {BaseQueuePopulator} from "./BaseQueuePopulator.mjs"
+import {db} from "../../db.mjs"
 
-class SearchPopulator extends BaseQueuePopulator {
+export class SearchPopulator extends BaseQueuePopulator {
 	/** */
 	constructor(postQueue) {
 		super(postQueue)
@@ -52,4 +52,4 @@ class SearchPopulator extends BaseQueuePopulator {
 	static searchDelay = 100
 }
 
-module.exports = SearchPopulator
+export default SearchPopulator

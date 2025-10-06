@@ -1113,7 +1113,7 @@ var units = {
 /*** Plumbing ***/
 
 (function (root, factory) {
-  RIFFWAVE = require("./riffwave.js");
+  RIFFWAVE = require("./riffwave.cjs");
   module.exports = (root.jsfxr = factory(RIFFWAVE))
 }(this, function (RIFFWAVE) {
   // module code here....

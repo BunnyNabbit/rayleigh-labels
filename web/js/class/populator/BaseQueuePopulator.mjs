@@ -1,6 +1,6 @@
-const EventEmitter = require("events")
+import { EventEmitter } from "events"
 
-class BaseQueuePopulator extends EventEmitter {
+export class BaseQueuePopulator extends EventEmitter {
 	/** */
 	constructor(postQueue) {
 		super()
@@ -29,4 +29,4 @@ class BaseQueuePopulator extends EventEmitter {
 	static searchDelay = 5000
 }
 
-module.exports = BaseQueuePopulator
+export default BaseQueuePopulator

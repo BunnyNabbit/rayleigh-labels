@@ -1,4 +1,4 @@
-class EventQueue {
+export class EventQueue {
 	/** */
 	constructor() {
 		this.queue = []
@@ -10,7 +10,6 @@ class EventQueue {
 			}
 		})
 	}
-	/** Add an event to the queue */
 	/** Add an event to the queue */
 	enqueue(event, volatile = false) {
 		this.queue.push({ event, retries: 0, volatile })
@@ -51,4 +50,4 @@ class EventQueue {
 	}
 }
 
-module.exports = EventQueue
+export default EventQueue
