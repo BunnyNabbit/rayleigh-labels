@@ -1,2 +1,3 @@
 onlyBuiltDependencies:
   - '@parcel/watcher'
+minimumReleaseAge: 1440
