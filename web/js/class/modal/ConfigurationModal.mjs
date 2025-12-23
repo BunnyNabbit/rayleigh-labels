@@ -358,17 +358,7 @@ export class ConfigurationModal extends BaseMenuModal {
 		this.addSetting(new NumberRangeSetting("reportCountScore", "Report record stat score", -1, -1000, 1000))
 		this.addSetting(new NumberRangeSetting("likeScore", "Post like score", 1, -1000, 1000))
 		this.addSetting(new Text("Some settings may require a page refresh to apply."))
-		// Restrained Rayleigh. Use localStorage.setItem(`rayleighSetting:restraints`, "true") to enable
-		if (localStorage.getItem(`${Setting.keyPrefix}restraints`) == "true") {
-			// a bit hacky, since a setting cannot be accessed if it doesn't exist
-			this.addSetting(new Divider())
-			this.addSetting(new Header("Restrained Rayleigh", 2))
-			this.addSetting(new Text("RR is an experimental tool. Use of restraints may not be suitable for some users."))
-			this.addSetting(new BooleanSetting("restraints", "Enable RR", false))
-			this.addSetting(new Header("Post viewing", 3))
-			this.addSetting(new NumberRangeSetting("minPostViewTIme", "View time", 10, 1, 60))
-			this.addSetting(new TextSetting("postViewTimeTrigger", "Trigger code", 'alert("Be for real.")'))
-		}
+		this.addSetting(new Divider())
 		this.renderSettings()
 	}
 
