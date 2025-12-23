@@ -37,3 +37,9 @@ oauthClient.addEventListener("deleted", (event) => {
 	const { sub, cause } = event.detail
 	alert(`Session for ${sub} is no longer available (cause: ${cause})`)
 })
+window.addEventListener("click", (event) => {
+	const fullscreenSetting = configurationModal.getSetting("fullscreen")
+	if (fullscreenSetting == true && !document.fullscreenElement) {
+		event.target.requestFullscreen()
+	}
+})
