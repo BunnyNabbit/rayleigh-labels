@@ -4,7 +4,7 @@
 	"display": "fullscreen",
 	"icons": [
 		{
-			"src": "web/placeholder/icon.png",
+			"src": "placeholder/icon.png",
 			"type": "image/png",
 			"sizes": "128x128"
 		}
