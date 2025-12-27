@@ -50,6 +50,8 @@ export class ClientAPI {
 		let queue = "tools.ozone.moderation.defs#reviewOpen"
 		if (queueParam == "escalated") {
 			queue = "tools.ozone.moderation.defs#reviewEscalated"
+		} else if (queueParam == "no review") {
+			queue = "tools.ozone.moderation.defs#reviewNone"
 		}
 		let reports = []
 		function fail() {
