@@ -1,7 +1,7 @@
 import { randomIntFromInterval } from "../utils.mjs"
 import { db } from "../db.mjs"
-/** @import ClientAPI from "./API.cjs" 8 */
-/** @import ConfigurationModal from "./modal/ConfigurationModal.cjs" 8 */
+/** @import ClientAPI from "./API.cjs" */
+/** @import ConfigurationModal from "./modal/ConfigurationModal.cjs" */
 
 export class PostQueue {
 	/**

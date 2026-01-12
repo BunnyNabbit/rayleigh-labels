@@ -189,7 +189,7 @@ export class MultiplePostEscalateInterface extends GenericInterface {
 					video.style.width = "100%"
 					video.style.height = "100%"
 					element.appendChild(video)
-				} else if (media.fullsize) {
+				} else if (media[this.imageQuality]) {
 					// image
 					if (!media.elementCache) this.preloadMedia(media)
 					const image = media.elementCache

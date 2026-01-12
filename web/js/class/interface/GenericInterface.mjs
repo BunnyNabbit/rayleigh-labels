@@ -1,12 +1,19 @@
 import Hls from "hls.js"
+/** @import {PostQueue} from "../PostQueue.mjs" */
+/** @import {ToyNoises} from "../sound/ToyNoises.mjs" */
 
 export class GenericInterface {
-	/** */
+	/**
+	 * @param {PostQueue} postQueue
+	 * @param {ToyNoises} toyNoises
+	 * @param {boolean} disableLabels
+	 */
 	constructor(postQueue, toyNoises, disableLabels) {
 		this.postQueue = postQueue
 		this.configurationModal = postQueue.configurationModal
 		this.postQueue.interface = this
 		this.toyNoises = toyNoises
+		this.imageQuality = this.configurationModal.getSetting("imageQuality")
 		// elements
 		this.container = document.createElement("div")
 		document.body.appendChild(this.container)
@@ -94,9 +101,9 @@ export class GenericInterface {
 
 	preloadMedia(media) {
 		media.loaded = false
-		if (media.fullsize) {
+		if (media[this.imageQuality]) {
 			const img = document.createElement("img")
-			img.src = media.fullsize
+			img.src = media[this.imageQuality]
 			img.classList.add("hidden")
 			media.elementCache = img
 			this.container.appendChild(img)
