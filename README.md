@@ -10,10 +10,11 @@ Rayleigh is not a replacement labeling service. It still requires a labeling ser
 
 Node.js should be installed prior to following these setup instructions.
 
-1. In the project directory, install dependencies with `npm i`.
-2. Copy `/example.env` to `/.env`. You will then edit the new files with relevant information.
-3. Run `npm run build` to build the web interface. Or use `npm run watch` to build on changed files.
-4. Run with `npm run start`. By default, the moderation interface can be accessed at port 3213. You may need to either deploy Rayleigh or use tunneling software to login.
+1. Ensure Corepack is enabled by using `corepack enable`.
+2. In the project directory, install dependencies with `pnpm i`.
+3. Copy `/example.env` to `/.env`. You will then edit the new files with relevant information.
+4. Run `pnpm run build` to build the web interface. Or use `pnpm run watch` to build on changed files.
+5. Run with `pnpm run start`. By default, the moderation interface can be accessed at port 3213. You may need to either deploy Rayleigh or use tunneling software to login.
 
 ## Configure
 
