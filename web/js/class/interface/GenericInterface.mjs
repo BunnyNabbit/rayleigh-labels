@@ -101,9 +101,10 @@ export class GenericInterface {
 
 	preloadMedia(media) {
 		media.loaded = false
-		if (media[this.imageQuality]) {
+		if (media[this.imageQuality] ?? /* It's named thumbnail instead of thumb. If previous check nulls, user was expecting thumb, so give thumbnail. */ media.thumbnail) {
 			const img = document.createElement("img")
-			img.src = media[this.imageQuality]
+			// TODO: potentially, make a class for simplifying "content.". seems like zhe right step forwards for refactoring.
+			img.src = media[this.imageQuality] ?? media.thumbnail
 			img.classList.add("hidden")
 			media.elementCache = img
 			this.container.appendChild(img)

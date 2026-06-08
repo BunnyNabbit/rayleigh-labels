@@ -4,8 +4,7 @@ import { db } from "../db.mjs"
 /** @import ConfigurationModal from "./modal/ConfigurationModal.cjs" */
 
 export class PostQueue {
-	/**
-	 * @param {ClientAPI} api
+	/**@param {ClientAPI} api
 	 * @param {ConfigurationModal} configurationModal
 	 */
 	constructor(api, configurationModal) {
@@ -73,7 +72,7 @@ export class PostQueue {
 	}
 
 	static filterTransformEmbedTypes(posts) {
-		const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view", "app.bsky.embed.video#view"]
+		const supportedTypes = ["app.bsky.embed.images#view", "app.bsky.embed.recordWithMedia#view", "app.bsky.embed.video#view", "app.bsky.embed.gallery#view"]
 		console.log("posts", posts)
 		const filteredPosts = posts.filter((post) => {
 			return post.embed && supportedTypes.includes(post.embed["$type"])
@@ -93,6 +92,7 @@ export class PostQueue {
 					]
 				}
 			}
+			if (type == "app.bsky.embed.gallery#view") post.renderImages = post.embed.items
 			if (type == "app.bsky.embed.video#view") post.renderImages = [post.embed]
 		})
 		return filteredPosts

@@ -12,23 +12,24 @@
   "author": "BunnyNabbit",
   "license": "MIT",
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "eslint": "^9.39.2",
+    "@eslint/js": "^9.39.4",
+    "eslint": "^9.39.4",
     "globals": "^15.15.0",
-    "html-webpack-plugin": "^5.6.5",
-    "prettier": "^3.7.4",
+    "html-webpack-plugin": "^5.6.7",
+    "prettier": "^3.8.3",
     "prettier-plugin-drone-class": "^0.1.0",
-    "webpack": "^5.104.1",
+    "webpack": "^5.107.2",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.2.2"
+    "webpack-dev-server": "^5.2.4"
   },
   "dependencies": {
-    "@atproto/api": "^0.17.0",
-    "@atproto/oauth-client-browser": "^0.3.27",
-    "dexie": "^4.0.11",
+    "@atproto/api": "^0.17.7",
+    "@atproto/oauth-client-browser": "^0.3.42",
+    "dexie": "^4.4.3",
     "dotenv": "^16.6.1",
     "events": "^3.3.0",
-    "express": "^4.21.2",
-    "hls.js": "^1.6.7"
-  }
+    "express": "^4.22.2",
+    "hls.js": "^1.6.16"
+  },
+  "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916"
 }
