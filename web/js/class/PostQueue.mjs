@@ -84,6 +84,7 @@ export class PostQueue {
 			if (type == "app.bsky.embed.recordWithMedia#view") {
 				if (post.embed.media["$type"] == "app.bsky.embed.images#view") post.renderImages = post.embed.media.images
 				if (post.embed.media["$type"] == "app.bsky.embed.video#view") post.renderImages = [post.embed.media]
+				if (post.embed.media["$type"] == "app.bsky.embed.gallery#view") post.renderImages = post.embed.media.items
 				if (post.embed.media["$type"] == "app.bsky.embed.external#view" && post.embed.media["$type"].external.thumb) {
 					post.renderImages = [
 						{
