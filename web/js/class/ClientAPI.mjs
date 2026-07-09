@@ -161,12 +161,12 @@ export class ClientAPI {
 
 	async searchPosts(query, cursor) {
 		const body = {
-			q: query,
+			query: query,
 			limit: 100,
 			sort: "recent",
 		}
 		if (cursor) body.cursor = cursor
-		return this.agent.app.bsky.feed.searchPosts(body)
+		return this.agent.app.bsky.feed.searchPostsV2(body)
 	}
 
 	static fromSession(session, labelerDid) {

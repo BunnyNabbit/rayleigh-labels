@@ -1,3 +1,5 @@
 onlyBuiltDependencies:
   - '@parcel/watcher'
 minimumReleaseAge: 1440
+allowBuilds:
+  core-js: false

@@ -23,7 +23,7 @@
     "webpack-dev-server": "^5.2.4"
   },
   "dependencies": {
-    "@atproto/api": "^0.17.7",
+    "@atproto/api": "^0.20.27",
     "@atproto/oauth-client-browser": "^0.3.42",
     "dexie": "^4.4.3",
     "dotenv": "^16.6.1",
