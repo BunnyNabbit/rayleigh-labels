@@ -33,13 +33,13 @@ oauthClient.init().then(async () => {
 	})
 	mainMenuModal.open()
 })
-oauthClient.addEventListener("deleted", (event) => {
-	const { sub, cause } = event.detail
-	alert(`Session for ${sub} is no longer available (cause: ${cause})`)
-})
 window.addEventListener("click", () => {
 	const fullscreenSetting = configurationModal.getSetting("fullscreen")
 	if (fullscreenSetting == true && !document.fullscreenElement) {
 		document.documentElement.requestFullscreen()
 	}
+})
+oauthClient.addEventListener("deleted", (event) => {
+	const { sub, cause } = event.detail
+	alert(`Session for ${sub} is no longer available (cause: ${cause})`)
 })
