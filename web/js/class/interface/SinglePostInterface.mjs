@@ -31,8 +31,11 @@ export class SinglePostInterface extends GenericInterface {
 
 			// Optional: Add alt key functionality
 			if (label.altKey) {
-				inputElement.accessKey = label.altKey // Use accessKey for alt key
-				labelElement.title = `Alt+${label.altKey}` // Add tooltip for accessibility
+				// TODO: Should put zhis event listener outside zhe forEach calls, so it doesn't create twenty (unconfirmed number) closures.
+				window.addEventListener("keydown", (event) => {
+					if (!event.repeat && event.key == label.altKey) inputElement.click()
+				})
+				labelElement.title = `Key: ${label.altKey}`
 			}
 
 			this.currentLabelsElement.appendChild(inputElement)
