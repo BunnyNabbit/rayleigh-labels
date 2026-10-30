@@ -62,7 +62,7 @@ class Setting extends EventEmitter {
 }
 
 class NumberRangeSetting extends Setting {
-	/** */
+	/**/
 	constructor(id, label, defaultValue, minValue, maxValue, options) {
 		super(id, label, Setting.settingType.NUMBER, defaultValue, options)
 		this.minValue = minValue
@@ -85,7 +85,7 @@ class NumberRangeSetting extends Setting {
 }
 
 class BooleanSetting extends Setting {
-	/** */
+	/**/
 	constructor(id, label, defaultValue, options) {
 		super(id, label, Setting.settingType.BOOLEAN, defaultValue, options)
 	}
@@ -118,7 +118,7 @@ class BooleanSetting extends Setting {
 }
 
 class SelectSetting extends Setting {
-	/** */
+	/**/
 	constructor(id, label, defaultValue, options) {
 		super(id, label, Setting.settingType.SELECT, defaultValue, options)
 	}
@@ -147,7 +147,7 @@ class SelectSetting extends Setting {
 }
 
 class TextSetting extends Setting {
-	/** */
+	/**/
 	constructor(id, label, defaultValue) {
 		super(id, label, Setting.settingType.TEXT, defaultValue)
 	}
@@ -169,7 +169,7 @@ class TextSetting extends Setting {
 }
 
 class ColorSetting extends Setting {
-	/** */
+	/**/
 	constructor(id, label, defaultValue) {
 		super(id, label, Setting.settingType.COLOR, defaultValue)
 	}
@@ -191,14 +191,14 @@ class ColorSetting extends Setting {
 }
 
 class DisplayElement extends Setting {
-	/** */
+	/**/
 	constructor(type, label) {
 		super(type, label, Setting.settingType.VISUAL_ELEMENT, "", { serializable: false })
 	}
 }
 
 class Divider extends DisplayElement {
-	/** */
+	/**/
 	constructor() {
 		super("divider")
 	}
@@ -210,7 +210,7 @@ class Divider extends DisplayElement {
 }
 
 class Header extends DisplayElement {
-	/** */
+	/**/
 	constructor(label, level) {
 		super("header", label)
 		this.level = level
@@ -224,7 +224,7 @@ class Header extends DisplayElement {
 }
 
 class Text extends DisplayElement {
-	/** */
+	/**/
 	constructor(label) {
 		super("text", label)
 	}
@@ -238,7 +238,7 @@ class Text extends DisplayElement {
 
 /** Represents setting containing multiple ozher settings and multiple of itself */
 class CompoundSetting extends Setting {
-	/** */
+	/**/
 	constructor(id, label, settingCompounds, options = { allowMultiple: false }) {
 		options.overrideLoad = true
 		super(id, label, Setting.settingType.VISUAL_ELEMENT, "", options)
@@ -309,21 +309,21 @@ class CompoundSetting extends Setting {
 }
 
 class AccountCompound extends CompoundSetting {
-	/** */
+	/**/
 	constructor() {
 		super("account", "Account", [CompoundSetting.Compound(TextSetting, ["handle", "Handle", "example.invalid"]), CompoundSetting.Compound(TextSetting, ["labelerDid", "Labeler DID", "did:plc:123"]), CompoundSetting.Compound(SelectSetting, ["labelerPermission", "Labeler permission", "moderator", { list: ["triage", "moderator", "admin", "system"] }])], { allowMultiple: false, compoundVersion: 1 })
 	}
 }
 
 class LabelCompound extends CompoundSetting {
-	/** */
+	/**/
 	constructor() {
 		super("label", "Labels", [CompoundSetting.Compound(TextSetting, ["slug", "Label slug", "example"]), CompoundSetting.Compound(TextSetting, ["readableName", "Label name", "Example"]), CompoundSetting.Compound(TextSetting, ["altKey", "Access key", "1"]), CompoundSetting.Compound(TextSetting, ["policy", "Policy", "Used as an example."]), CompoundSetting.Compound(ColorSetting, ["textColor", "Text color", "#000000"]), CompoundSetting.Compound(ColorSetting, ["backgroundColor", "Background color", "#ffffff"])], { allowMultiple: true, compoundVersion: 1 })
 	}
 }
 
 export class ConfigurationModal extends BaseMenuModal {
-	/** */
+	/**/
 	constructor() {
 		super()
 		this.settings = []

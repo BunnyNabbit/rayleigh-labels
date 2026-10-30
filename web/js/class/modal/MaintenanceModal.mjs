@@ -3,7 +3,7 @@ import DatabaseDump from "../DatabaseDump.mjs"
 import db from "../../db.mjs"
 
 export class MaintenanceModal extends BaseMenuModal {
-	/** */
+	/**/
 	constructor(toyNoises) {
 		super(false, toyNoises)
 		this.addCloseButton()

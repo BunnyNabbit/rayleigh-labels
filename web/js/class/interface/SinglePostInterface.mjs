@@ -3,7 +3,7 @@ import { InputControls } from "../InputControls.mjs"
 import { GenericInterface } from "./GenericInterface.mjs"
 
 export class SinglePostInterface extends GenericInterface {
-	/** */
+	/**/
 	constructor(postQueue, toyNoises) {
 		super(postQueue, toyNoises, true)
 		this.postQueue = postQueue

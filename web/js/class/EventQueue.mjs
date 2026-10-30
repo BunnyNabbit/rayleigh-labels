@@ -1,5 +1,5 @@
 export class EventQueue {
-	/** */
+	/**/
 	constructor() {
 		this.queue = []
 		this.isProcessing = false

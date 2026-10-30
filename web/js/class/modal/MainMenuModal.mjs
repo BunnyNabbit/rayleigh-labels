@@ -3,7 +3,7 @@ import { ClientAPI } from "../../class/ClientAPI.mjs"
 import { PostQueue } from "../../class/PostQueue.mjs"
 import { PopulatorQuestionModal } from "./PopulatorQuestionModal.mjs"
 export class MainMenuModal extends BaseMenuModal {
-	/** */
+	/**/
 	constructor(toyNoises) {
 		super(true, toyNoises)
 	}

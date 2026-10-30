@@ -3,7 +3,7 @@ import { BaseQueuePopulator } from "./BaseQueuePopulator.mjs"
 import { db } from "../../db.mjs"
 
 export class SearchPopulator extends BaseQueuePopulator {
-	/** */
+	/**/
 	constructor(postQueue) {
 		super(postQueue)
 		this.query = null

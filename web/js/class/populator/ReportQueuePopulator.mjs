@@ -4,7 +4,7 @@ import { chunkArray } from "../../utils.mjs"
 import { ClientAPI } from "../ClientAPI.mjs"
 
 export class ReportQueuePopulator extends BaseQueuePopulator {
-	/** */
+	/**/
 	constructor(postQueue) {
 		super(postQueue)
 	}

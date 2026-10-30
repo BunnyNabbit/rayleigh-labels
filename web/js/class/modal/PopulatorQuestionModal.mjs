@@ -3,7 +3,7 @@ import { SearchPopulator } from "../populator/SearchPopulator.mjs"
 import { ReportQueuePopulator } from "../populator/ReportQueuePopulator.mjs"
 
 export class PopulatorQuestionModal extends BaseMenuModal {
-	/** */
+	/**/
 	constructor(toyNoises) {
 		super(false, toyNoises)
 		this.addCloseButton()

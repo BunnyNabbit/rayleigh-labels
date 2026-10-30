@@ -4,7 +4,7 @@ import { ToyNoises } from "../sound/ToyNoises.mjs"
 
 // Displays media from posts in a grid. Click to escalate a post, removing it from queue and view.
 export class MultiplePostEscalateInterface extends GenericInterface {
-	/** */
+	/**/
 	constructor(postQueue, toyNoises) {
 		super(postQueue, toyNoises, true)
 		this.overflowPost = null
@@ -69,7 +69,7 @@ export class MultiplePostEscalateInterface extends GenericInterface {
 		})
 		this.updatePositionIndicator()
 	}
-	/**Gets posts from queue and displays them */
+	/** Gets posts from queue and displays them */
 	next() {
 		if (this.postQueue.queue[0]) {
 			this.postQueue.backQueue.unshift(...this.currentPosts) // add current posts to back queue

@@ -3,8 +3,7 @@ import Hls from "hls.js"
 /** @import {ToyNoises} from "../sound/ToyNoises.mjs" */
 
 export class GenericInterface {
-	/**
-	 * @param {PostQueue} postQueue
+	/**@param {PostQueue} postQueue
 	 * @param {ToyNoises} toyNoises
 	 * @param {boolean} disableLabels
 	 */

@@ -1,5 +1,5 @@
 export class NullNoises {
-	/** */
+	/**/
 	constructor() {}
 
 	playSound() {}
