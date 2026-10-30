@@ -1,7 +1,7 @@
 /** @type {import("prettier").Config} */
 export default {
 	semi: false,
-	plugins: ["prettier-plugin-drone-jsdoc", "prettier-plugin-drone-class"],
+	plugins: ["prettier-plugin-drone-class", "prettier-plugin-drone-jsdoc"],
 	jsdocSeparateReturnsFromParam: false,
 	tsdoc: true,
 	jsdocTagsOrder: '{"todo":0}',
