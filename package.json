@@ -18,6 +18,7 @@
     "html-webpack-plugin": "^5.6.7",
     "prettier": "^3.8.3",
     "prettier-plugin-drone-class": "^0.1.0",
+    "prettier-plugin-drone-jsdoc": "^1.8.0",
     "webpack": "^5.107.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.4"
@@ -31,5 +32,5 @@
     "express": "^4.22.2",
     "hls.js": "^1.6.16"
   },
-  "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916"
+  "packageManager": "pnpm@11.28.9+sha512.35421cea2720eca3f5ad722b67e8ef18f4d3cd4745ed2fcfeb0dc288d4e9437fad3870d91ee6e83f268f0f6f7e0f62723317b19617bb45ee4333172ef51159f8"
 }
