@@ -1,5 +1,5 @@
 import { EventEmitter } from "events"
-
+/** @todo A populator populates a queue */
 export class BaseQueuePopulator extends EventEmitter {
 	/**/
 	constructor(postQueue) {
