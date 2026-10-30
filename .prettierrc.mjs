@@ -1,7 +1,7 @@
 /** @type {import("prettier").Config} */
 export default {
 	semi: false,
-	plugins: ["prettier-plugin-drone-class", "prettier-plugin-drone-jsdoc"],
+	plugins: ["prettier-plugin-drone-jsdoc", "prettier-plugin-drone-class"],
 	printWidth: Infinity,
 	trailingComma: "es5",
 	useTabs: true,
