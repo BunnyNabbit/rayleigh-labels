@@ -1,5 +1,5 @@
 export class HandleResolver {
-	/** */
+	/** @todo Yet to be documented */
 	constructor() {
 		this.cache = new Map()
 	}

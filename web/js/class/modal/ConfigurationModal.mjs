@@ -2,17 +2,15 @@ import { BaseMenuModal } from "./BaseMenuModal.mjs"
 import { ToyNoises } from "../sound/ToyNoises.mjs"
 import { EventEmitter } from "events"
 
-/**
- * Represents a configurable setting.
- */
+/** Represents a configurable setting. */
 class Setting extends EventEmitter {
-	/**
-	 * Creates a new Setting instance.
+	/**Creates a new Setting instance.
+	 *
 	 * @param {string} id - The unique identifier for the setting.
 	 * @param {string} label - The display label for the setting.
 	 * @param {string} type - The type of the setting (e.g., text, number, boolean, select).
-	 * @param {*} defaultValue - The default value for the setting.
-	 * @param {Object} [options={}] - Additional options for the setting.
+	 * @param {any} defaultValue - The default value for the setting.
+	 * @param {Object} [options={}] - Additional options for the setting. Default is `{}`
 	 */
 	constructor(id, label, type, defaultValue, options = {}) {
 		super()
@@ -23,32 +21,28 @@ class Setting extends EventEmitter {
 		if (!this.options.overrideLoad) this.value = this.load() ?? defaultValue
 	}
 
-	/**
-	 * Loads the setting value from local storage.
-	 * @returns {*} The loaded value, or null if not found.
+	/**Loads the setting value from local storage.
+	 *
+	 * @returns {any} The loaded value, or null if not found.
 	 */
 	load() {
 		return localStorage.getItem(Setting.keyPrefix + this.id)
 	}
 
-	/**
-	 * Saves the current setting value to local storage.
-	 */
+	/** Saves the current setting value to local storage. */
 	save(dry) {
 		const data = { id: this.id, value: this.value }
 		if (!dry) localStorage.setItem(Setting.keyPrefix + data.id, data.value)
 		return data
 	}
 
-	/**
-	 * Resets the setting value to its default value.
-	 */
+	/** Resets the setting value to its default value. */
 	reset() {
 		this.value = this.defaultValue
 	}
 
-	/**
-	 * Enumeration of possible setting types.
+	/**Enumeration of possible setting types.
+	 *
 	 * @enum {string}
 	 */
 	static settingType = {
@@ -60,8 +54,8 @@ class Setting extends EventEmitter {
 		VISUAL_ELEMENT: "visualElement",
 	}
 
-	/**
-	 * The prefix used for setting keys in local storage.
+	/**The prefix used for setting keys in local storage.
+	 *
 	 * @type {string}
 	 */
 	static keyPrefix = "rayleighSetting:"
@@ -386,6 +380,7 @@ export class ConfigurationModal extends BaseMenuModal {
 	}
 
 	/**Renders a setting to the modal.
+	 *
 	 * @param {Setting} setting - The setting to render.
 	 * @param {Setting} [parent] - The parent setting, if applicable.
 	 * @param {HTMLElement} [targetElement] - The target element to append the setting to.

@@ -1,7 +1,7 @@
 import { EventEmitter } from "events"
 
 export class InputControls extends EventEmitter {
-	/** */
+	/** @todo Yet to be documented */
 	constructor() {
 		super()
 		document.addEventListener("keydown", (event) => {

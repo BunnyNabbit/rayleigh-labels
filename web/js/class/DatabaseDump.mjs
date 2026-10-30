@@ -2,6 +2,7 @@
 /** Represents a growing buffer. */
 class GrowBuffer {
 	/**Creates a new GrowBuffer instance.
+	 *
 	 * @param {number} initialSize - The initial size of the buffer.
 	 * @param {number} resizeIncrement - The amount to increase the buffer size when it needs to grow.
 	 */
@@ -12,6 +13,7 @@ class GrowBuffer {
 		this.buffer = new Uint8Array(initialSize)
 	}
 	/**Resizes the buffer to the specified size.
+	 *
 	 * @param {number} newSize - The new size of the buffer.
 	 */
 	resize(newSize) {
@@ -20,6 +22,7 @@ class GrowBuffer {
 		this.buffer = newBuffer
 	}
 	/**Trims bytes from beginning of buffer.
+	 *
 	 * @param {number} num - The number of bytes to trim.
 	 */
 	trim(num) {
@@ -35,6 +38,7 @@ class GrowBuffer {
 		return removed
 	}
 	/**Writes bytes to the buffer.
+	 *
 	 * @param {Uint8Array} bytes - The bytes to write.
 	 */
 	writeBytes(bytes) {
@@ -46,6 +50,7 @@ class GrowBuffer {
 		this.currentSize += bytes.length
 	}
 	/**Writes a string to the buffer.
+	 *
 	 * @param {string} string - The string to write.
 	 * @param {boolean} writeLength - Whether to write the length of the string first.
 	 */
@@ -58,6 +63,7 @@ class GrowBuffer {
 		this.writeBytes(bytes)
 	}
 	/**Writes a 32-bit unsigned integer to the buffer.
+	 *
 	 * @param {number} value - The value to write.
 	 */
 	writeUint32(value) {
@@ -74,9 +80,10 @@ class GrowBuffer {
 		return this.buffer.subarray(0, this.currentSize)
 	}
 }
-/** Represents a stream reader that reads from a stream and buffers the data.*/
+/** Represents a stream reader that reads from a stream and buffers the data. */
 class StreamReader extends GrowBuffer {
 	/**Creates a new StreamReader instance.
+	 *
 	 * @param {ReadableStream} stream - The stream to read from.
 	 */
 	constructor(stream) {
@@ -148,6 +155,7 @@ class StreamReader extends GrowBuffer {
 	}
 }
 /**Namespace for database dump operations.
+ *
  * @namespace DatabaseDump
  */
 export class DatabaseDump {
@@ -157,6 +165,7 @@ export class DatabaseDump {
 		metadata: 0xff,
 	}
 	/**Dumps the database to a file.
+	 *
 	 * @param {Dexie} db - The database to export.
 	 * @param {FileSystemHandle} fileHandle - The file handle to write to.
 	 * @returns {Promise<void>} - A promise that resolves when the export is complete.
@@ -210,6 +219,7 @@ export class DatabaseDump {
 		alert("Export completed")
 	}
 	/**Imports the database from a dump.
+	 *
 	 * @param {Dexie} db - The database to import into.
 	 * @param {FileSystemHandle} fileHandle - The file handle to read from.
 	 * @returns {Promise<void>} - A promise that resolves when the import is complete.

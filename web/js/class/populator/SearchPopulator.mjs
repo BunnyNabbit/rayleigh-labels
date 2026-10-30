@@ -1,6 +1,6 @@
-import {PostQueue} from "../PostQueue.mjs"
-import {BaseQueuePopulator} from "./BaseQueuePopulator.mjs"
-import {db} from "../../db.mjs"
+import { PostQueue } from "../PostQueue.mjs"
+import { BaseQueuePopulator } from "./BaseQueuePopulator.mjs"
+import { db } from "../../db.mjs"
 
 export class SearchPopulator extends BaseQueuePopulator {
 	/** */

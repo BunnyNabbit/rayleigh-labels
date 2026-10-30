@@ -2,8 +2,7 @@ import { Agent } from "@atproto/api"
 import { EventQueue } from "./EventQueue.mjs"
 
 export class ClientAPI {
-	/**
-	 * @param {Agent} agent
+	/**@param {Agent} agent
 	 * @param {string} labelerDid
 	 */
 	constructor(agent, labelerDid) {

@@ -1,7 +1,7 @@
 import { EventEmitter } from "events"
 
 export class BaseQueuePopulator extends EventEmitter {
-	/** */
+	/**/
 	constructor(postQueue) {
 		super()
 		this.postQueue = postQueue

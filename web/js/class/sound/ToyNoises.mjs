@@ -1,12 +1,8 @@
 import { SoundEffect } from "../../vendor/sfxr.cjs"
 
-/**
- * Class for playing SFXR sound effects
- */
+/** Class for playing SFXR sound effects */
 export class ToyNoises {
-	/**
-	 * Create a ToyNoises instance.
-	 */
+	/** Create a ToyNoises instance. */
 	constructor() {
 		this.sfxrGenerationDegradation = 0
 		this.interval = setInterval(() => {
@@ -14,8 +10,8 @@ export class ToyNoises {
 		}, 300)
 	}
 
-	/**
-	 * Play a sound based on the provided sfxr payload.
+	/**Play a sound based on the provided sfxr payload.
+	 *
 	 * @param {string} sfxrPayload - The payload for the sound effect.
 	 */
 	playSound(sfxrPayload) {
@@ -28,16 +24,12 @@ export class ToyNoises {
 		audio.play()
 	}
 
-	/**
-	 * Destroy the ToyNoises instance and clear the interval.
-	 */
+	/** Destroy the ToyNoises instance and clear the interval. */
 	destroy() {
 		clearInterval(this.interval)
 	}
 
-	/**
-	 * Static object containing predefined sound identifiers.
-	 */
+	/** Static object containing predefined sound identifiers. */
 	static sounds = {
 		lastInPost: "11111GvZH7jwT4FjsvL4Kt7D9TBj81nTkcvBs3VbcAfsTdCKdtFu6AmMN5iKGM55Y4cPxiz6SG7etbWKP2QkiVwBfo54smV8s9t7v37V7MT1vDs7CEjwSjSf",
 		hasLabel: "3Yw2CxDjPUsnbj3nAaw1boqFv8ordh7fvnYwRtUhUouLzXFrNBA8YeybkVQCnjpiXefXnmDMmdgzarbnuxdhmnXrNsnd99tdHiHZYYEAoFANNHyhiycwYCX8B",
