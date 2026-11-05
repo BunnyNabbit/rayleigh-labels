@@ -1,9 +1,12 @@
 import { EventEmitter } from "events"
+/** @import {PostQueue} from "../PostQueue.mjs" */
+
 /** @todo A populator populates a queue */
 export class BaseQueuePopulator extends EventEmitter {
-	/**/
+	/** @param {PostQueue} postQueue */
 	constructor(postQueue) {
 		super()
+		/** @type {PostQueue} */
 		this.postQueue = postQueue
 		postQueue.populator = this
 		this.running = false
