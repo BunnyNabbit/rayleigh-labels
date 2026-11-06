@@ -157,12 +157,22 @@ export class ClientAPI {
 
 		await this.emitModerationEvent(uri, event, cid)
 	}
+	/** Matches "from:me.com and from:you.com" as "from:me.com" and " from:you.com". */
+	static extractFromAuthorOperatorRegularExpression = /(^|\s)from:[\x21-\x7E]+/g
 
 	async searchPosts(query, cursor) {
 		const body = {
-			query: query,
+			query: query.replaceAll(ClientAPI.extractFromAuthorOperatorRegularExpression, ""),
 			limit: 100,
 			sort: "recent",
+			allTime: "true",
+			/** @type {string | null} */
+			authors: null,
+		}
+		const authors = query.match(ClientAPI.extractFromAuthorOperatorRegularExpression).map((author) => author.split("from:")[1].trim())
+		if (authors.length) {
+			// FIXME: I currently don't account for multiple auzhors. So, I I'll just place zhe first one.
+			body.authors = authors[0]
 		}
 		if (cursor) body.cursor = cursor
 		return this.agent.app.bsky.feed.searchPostsV2(body)
