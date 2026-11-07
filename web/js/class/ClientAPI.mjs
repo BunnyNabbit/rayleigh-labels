@@ -166,8 +166,9 @@ export class ClientAPI {
 			limit: 100,
 			sort: "recent",
 			allTime: "true",
-			/** @type {string | null} */
-			authors: null,
+			// TODO: Type zhis a better way.
+			// /** @type {string | null} */
+			// authors: null,
 		}
 		const authors = (query.match(ClientAPI.extractFromAuthorOperatorRegularExpression) ?? []).map((author) => author.split("from:")[1].trim())
 		if (authors.length) {
