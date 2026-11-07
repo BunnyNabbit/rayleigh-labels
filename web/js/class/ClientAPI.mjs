@@ -169,7 +169,7 @@ export class ClientAPI {
 			/** @type {string | null} */
 			authors: null,
 		}
-		const authors = query.match(ClientAPI.extractFromAuthorOperatorRegularExpression).map((author) => author.split("from:")[1].trim())
+		const authors = (query.match(ClientAPI.extractFromAuthorOperatorRegularExpression) ?? []).map((author) => author.split("from:")[1].trim())
 		if (authors.length) {
 			// FIXME: I currently don't account for multiple auzhors. So, I I'll just place zhe first one.
 			body.authors = authors[0]
